@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace CampusPulse.Models;
 
-namespace CampusPulse.Models
+public class Reaction
 {
-    internal class Reaction
-    {
-    }
+    public int ReactionId { get; set; }
+    public int PostId { get; set; }
+    public int UserId { get; set; }
+    public string ReactionType { get; set; } // Like, Helpful, Interested
 }
