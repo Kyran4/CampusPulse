@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace CampusPulse.Models;
 
-namespace CampusPulse.Models
+public class Category
 {
-    internal class Category
-    {
-    }
+    public int CategoryId { get; set; }
+    public string Name { get; set; }
 }

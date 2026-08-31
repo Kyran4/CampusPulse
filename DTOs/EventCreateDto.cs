@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace CampusPulse.DTOs;
 
-namespace CampusPulse.DTOs
+public class EventCreateDto
 {
-    internal class EventCreateDto
-    {
-    }
+    public string Title { get; set; }
+    public string Description { get; set; }
+    public DateTime Date { get; set; }
+    public string Location { get; set; }
+    public int CategoryId { get; set; }
+    public int Capacity { get; set; }
 }

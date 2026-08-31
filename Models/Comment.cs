@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace CampusPulse.Models;
 
-namespace CampusPulse.Models
+public class Comment
 {
-    internal class Comment
-    {
-    }
+    public int CommentId { get; set; }
+    public int PostId { get; set; }
+    public int UserId { get; set; }
+    public string Content { get; set; }
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 }

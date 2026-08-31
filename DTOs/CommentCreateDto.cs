@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace CampusPulse.DTOs;
 
-namespace CampusPulse.DTOs
+public class CommentCreateDto
 {
-    internal class CommentCreateDto
-    {
-    }
+    public int PostId { get; set; }
+    public string Content { get; set; }
 }
