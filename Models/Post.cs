@@ -1,13 +1,16 @@
 ﻿namespace CampusPulse.Models;
 
 public class Post
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CampusPulse.Models
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CampusPulse.Models
 {
-    public int PostId { get; set; }
-    public int UserId { get; set; }
-    public string Title { get; set; }
-    public string Content { get; set; }
-    public int CategoryId { get; set; }
-    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
-    public DateTime? UpdatedDate { get; set; }
-    public bool IsHidden { get; set; } = false;
+    internal class Post
+    {
+    }
 }

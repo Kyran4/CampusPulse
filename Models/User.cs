@@ -1,12 +1,12 @@
 ﻿namespace CampusPulse.Models;
 
 public class User
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CampusPulse.Models
 {
-    public int UserId { get; set; }
-    public string DisplayName { get; set; }
-    public string Email { get; set; }
-    public string PasswordHash { get; set; }
-    public string Role { get; set; } // "Student" or "Admin"
-    public bool IsActive { get; set; } = true;
-    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    internal class User
+    {
+    }
 }

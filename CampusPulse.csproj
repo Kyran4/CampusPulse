@@ -111,6 +111,7 @@
 	  <MauiXaml Update="Views\ReportsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+>>>>>>> master
 	</ItemGroup>
 
 </Project>
