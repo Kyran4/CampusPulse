@@ -3,12 +3,62 @@
     x:Class="CampusPulse.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:CampusPulse"
-    Title="CampusPulse">
+    xmlns:views="clr-namespace:CampusPulse.Views">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <!-- MAIN TABS (Student Area) -->
+    <TabBar>
+        <ShellContent
+            Title="Feed"
+            Icon="icon_feed.png"
+            ContentTemplate="{DataTemplate views:FeedPage}" />
+
+        <ShellContent
+            Title="Events"
+            Icon="icon_events.png"
+            ContentTemplate="{DataTemplate views:EventsPage}" />
+
+        <ShellContent
+            Title="Create"
+            Icon="icon_create.png"
+            ContentTemplate="{DataTemplate views:CreatePostPage}" />
+
+        <ShellContent
+            Title="Profile"
+            Icon="icon_profile.png"
+            ContentTemplate="{DataTemplate views:ProfilePage}" />
+    </TabBar>
+
+    <!-- ADMIN FLYOUT -->
+    <FlyoutItem
+        Title="Admin Dashboard"
+        Icon="icon_admin.png"
+        Route="AdminDashboardPage"
+        FlyoutDisplayOptions="AsSingleItem">
+        <ShellContent ContentTemplate="{DataTemplate views:AdminDashboardPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem
+        Title="Moderation"
+        Icon="icon_moderation.png"
+        Route="AdminModerationPage"
+        FlyoutDisplayOptions="AsSingleItem">
+        <ShellContent ContentTemplate="{DataTemplate views:AdminModerationPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem
+        Title="Reports"
+        Icon="icon_reports.png"
+        Route="ReportsPage"
+        FlyoutDisplayOptions="AsSingleItem">
+        <ShellContent ContentTemplate="{DataTemplate views:ReportsPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem
+        Title="About"
+        Icon="icon_info.png"
+        Route="AboutPage"
+        FlyoutDisplayOptions="AsSingleItem">
+        <ShellContent ContentTemplate="{DataTemplate views:AboutPage}" />
+    </FlyoutItem>
 
 </Shell>
