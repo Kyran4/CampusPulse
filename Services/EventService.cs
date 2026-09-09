@@ -8,5 +8,6 @@ namespace CampusPulse.Services
 {
     internal class EventService
     {
+
     }
 }

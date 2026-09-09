@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="CampusPulse.Views.InterestsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Interests">
+
+    <Grid
+        Padding="20"
+        RowDefinitions="Auto,Auto,*"
+        RowSpacing="10">
+
+        <Label
+            Grid.Row="0"
+            Text="Your Interests"
+            FontSize="28"
+            FontAttributes="Bold" />
+
+        <Label
+            Grid.Row="1"
+            Text="Follow campus interests to personalise the content you see."
+            FontSize="14"
+            TextColor="Gray"
+            Margin="0,0,0,10" />
+
+        <CollectionView
+            Grid.Row="2"
+            ItemsSource="{Binding Interests}">
+
+            <CollectionView.ItemTemplate>
+
+                <DataTemplate>
+
+                    <Border
+                        Stroke="#DDDDDD"
+                        StrokeThickness="1"
+                        Padding="15"
+                        Margin="0,5">
+
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
+
+                        <Grid
+                            ColumnDefinitions="*,Auto"
+                            ColumnSpacing="10">
+
+                            <Label
+                                Grid.Column="0"
+                                Text="{Binding Name}"
+                                FontSize="18"
+                                VerticalOptions="Center" />
+
+                            <Button
+                                Grid.Column="1"
+                                Text="{Binding FollowButtonText}"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ToggleFollowCommand}"
+                                CommandParameter="{Binding}"
+                                WidthRequest="100" />
+
+                        </Grid>
+
+                    </Border>
+
+                </DataTemplate>
+
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+    </Grid>
+
+</ContentPage>
