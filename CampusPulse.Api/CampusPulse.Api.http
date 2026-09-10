@@ -9,3 +9,8 @@ POST {{CampusPulse_Api_HostAddress}}/api/interests/3/follow/1
 Accept: application/json
 
 ###
+
+DELETE {{CampusPulse_Api_HostAddress}}/api/interests/3/follow/1
+Accept: application/json
+
+###

@@ -55,4 +55,27 @@ public class InterestsController : ControllerBase
             interestId
         });
     }
+
+    [HttpDelete("{interestId}/follow/{userId}")]
+    public IActionResult UnfollowInterest(int interestId, int userId)
+    {
+        if (!FollowedInterests.ContainsKey(userId))
+        {
+            return NotFound("User is not following any interests.");
+        }
+
+        if (!FollowedInterests[userId].Contains(interestId))
+        {
+            return NotFound("Interest is not currently followed.");
+        }
+
+        FollowedInterests[userId].Remove(interestId);
+
+        return Ok(new
+        {
+            message = "Interest unfollowed successfully.",
+            userId,
+            interestId
+        });
+    }
 }
