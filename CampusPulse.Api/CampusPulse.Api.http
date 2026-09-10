@@ -1,6 +1,11 @@
-@CampusPulse.Api_HostAddress = http://localhost:5012
+@CampusPulse_Api_HostAddress = http://localhost:5012
 
-GET {{CampusPulse.Api_HostAddress}}/weatherforecast/
+GET {{CampusPulse_Api_HostAddress}}/api/interests
+Accept: application/json
+
+###
+
+POST {{CampusPulse_Api_HostAddress}}/api/interests/3/follow/1
 Accept: application/json
 
 ###

@@ -24,4 +24,35 @@ public class InterestsController : ControllerBase
     {
         return Ok(Interests);
     }
+
+    private static readonly Dictionary<int, List<int>> FollowedInterests = new();
+
+    [HttpPost("{interestId}/follow/{userId}")]
+    public IActionResult FollowInterest(int interestId, int userId)
+    {
+        var interest = Interests
+            .FirstOrDefault(i => i.CategoryId == interestId);
+
+        if (interest == null)
+        {
+            return NotFound("Interest not found.");
+        }
+
+        if (!FollowedInterests.ContainsKey(userId))
+        {
+            FollowedInterests[userId] = new List<int>();
+        }
+
+        if (!FollowedInterests[userId].Contains(interestId))
+        {
+            FollowedInterests[userId].Add(interestId);
+        }
+
+        return Ok(new
+        {
+            message = $"Now following {interest.Name}",
+            userId,
+            interestId
+        });
+    }
 }
