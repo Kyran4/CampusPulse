@@ -14,3 +14,8 @@ DELETE {{CampusPulse_Api_HostAddress}}/api/interests/3/follow/1
 Accept: application/json
 
 ###
+
+GET {{CampusPulse_Api_HostAddress}}/api/interests/followed/1
+Accept: application/json
+
+###

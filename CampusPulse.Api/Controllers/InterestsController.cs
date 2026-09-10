@@ -59,23 +59,48 @@ public class InterestsController : ControllerBase
     [HttpDelete("{interestId}/follow/{userId}")]
     public IActionResult UnfollowInterest(int interestId, int userId)
     {
+        var interest = Interests
+            .FirstOrDefault(i => i.CategoryId == interestId);
+
+        if (interest == null)
+        {
+            return NotFound("Interest not found.");
+        }
+
         if (!FollowedInterests.ContainsKey(userId))
         {
-            return NotFound("User is not following any interests.");
+            return NotFound("No followed interests.");
         }
 
         if (!FollowedInterests[userId].Contains(interestId))
         {
-            return NotFound("Interest is not currently followed.");
+            return NotFound("Interest not followed.");
         }
 
         FollowedInterests[userId].Remove(interestId);
 
         return Ok(new
         {
-            message = "Interest unfollowed successfully.",
+            message = $"Unfollowed {interest.Name}",
             userId,
             interestId
         });
+    }
+
+    [HttpGet("followed/{userId}")]
+    public ActionResult<List<Interest>> GetFollowedInterests(int userId)
+    {
+        if (!FollowedInterests.ContainsKey(userId))
+        {
+            return Ok(new List<Interest>());
+        }
+
+        var followedIds = FollowedInterests[userId];
+
+        var followed = Interests
+            .Where(i => followedIds.Contains(i.CategoryId))
+            .ToList();
+
+        return Ok(followed);
     }
 }
