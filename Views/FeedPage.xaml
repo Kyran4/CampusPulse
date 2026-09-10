@@ -1,12 +1,84 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="CampusPulse.Views.FeedPage"
-             Title="FeedPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+
+<ContentPage
+    x:Class="CampusPulse.Views.FeedPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Feed">
+
+    <Grid
+        Padding="20"
+        RowDefinitions="Auto,Auto,*"
+        RowSpacing="10">
+
+        <Label
+            Grid.Row="0"
+            Text="Campus Feed"
+            FontSize="28"
+            FontAttributes="Bold" />
+
+        <Label
+            Grid.Row="1"
+            Text="See the latest posts and updates from around campus."
+            FontSize="14"
+            TextColor="Gray"
+            Margin="0,0,0,10" />
+
+        <CollectionView
+            Grid.Row="2"
+            ItemsSource="{Binding Posts}">
+
+            <CollectionView.ItemTemplate>
+
+                <DataTemplate>
+
+                    <Border
+                        Stroke="#DDDDDD"
+                        StrokeThickness="1"
+                        Padding="15"
+                        Margin="0,6">
+
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12" />
+                        </Border.StrokeShape>
+
+                        <VerticalStackLayout Spacing="8">
+
+                            <Grid ColumnDefinitions="*,Auto">
+
+                                <Label
+                                    Grid.Column="0"
+                                    Text="{Binding Category}"
+                                    FontSize="13"
+                                    TextColor="Gray" />
+
+                                <Label
+                                    Grid.Column="1"
+                                    Text="{Binding Date}"
+                                    FontSize="13"
+                                    TextColor="Gray" />
+
+                            </Grid>
+
+                            <Label
+                                Text="{Binding Title}"
+                                FontSize="20"
+                                FontAttributes="Bold" />
+
+                            <Label
+                                Text="{Binding Content}"
+                                FontSize="15" />
+
+                        </VerticalStackLayout>
+
+                    </Border>
+
+                </DataTemplate>
+
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+    </Grid>
+
 </ContentPage>
