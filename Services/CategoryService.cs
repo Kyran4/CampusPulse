@@ -1,43 +1,18 @@
-﻿using CampusPulse.Helpers;
 using CampusPulse.Models;
-using SQLite;
 
 namespace CampusPulse.Services;
 
 public class CategoryService
 {
-    private readonly SQLiteAsyncConnection _db;
+    private readonly ApiClient _api;
 
-    public CategoryService(DatabaseService database)
+    public CategoryService(ApiClient api)
     {
-        _db = database.Connection;
+        _api = api;
     }
 
-    public Task<List<Category>> GetCategoriesAsync()
+    public async Task<List<Category>?> GetCategoriesAsync()
     {
-        return _db.Table<Category>().ToListAsync();
-    }
-
-    public async Task<bool> AddCategoryAsync(string name)
-    {
-        var admin = SessionManager.CurrentUser;
-        if (admin == null || admin.Role != "Admin")
-            return false;
-
-        await _db.InsertAsync(new Category { Name = name });
-        return true;
-    }
-
-    public async Task<bool> DeleteCategoryAsync(int id)
-    {
-        var admin = SessionManager.CurrentUser;
-        if (admin == null || admin.Role != "Admin")
-            return false;
-
-        var cat = await _db.Table<Category>().Where(c => c.CategoryId == id).FirstOrDefaultAsync();
-        if (cat == null) return false;
-
-        await _db.DeleteAsync(cat);
-        return true;
+        return await _api.GetAsync<List<Category>>("api/categories");
     }
 }

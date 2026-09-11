@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="CampusPulse.Views.AdminUsersPage"
+    x:Name="RootPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="{StaticResource LightGray}">
+
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <Grid BackgroundColor="{StaticResource PrimaryColor}" Padding="20">
+            <Label Text="Manage Users" Style="{StaticResource TitleLabel}" />
+        </Grid>
+
+        <Grid Grid.Row="1" Padding="20,10" ColumnDefinitions="*,Auto" ColumnSpacing="10">
+            <Frame Grid.Column="0" Style="{StaticResource Card}" Padding="0" CornerRadius="10">
+                <Entry Placeholder="Search by name or email..."
+                       Text="{Binding SearchText}"
+                       Style="{StaticResource InputField}" />
+            </Frame>
+            <Button Grid.Column="1" Text="Search"
+                    Style="{StaticResource PrimaryButton}"
+                    Command="{Binding BindingContext.SearchCommand, Source={x:Reference RootPage}}" />
+        </Grid>
+
+        <CollectionView
+            Grid.Row="2"
+            ItemsSource="{Binding Users}"
+            SelectionMode="None"
+            Margin="20">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Style="{StaticResource Card}">
+                        <VerticalStackLayout Spacing="6">
+
+                            <Label Text="{Binding DisplayName}"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource SecondaryColor}" />
+
+                            <Label Text="{Binding Email}" Style="{StaticResource BodyLabel}" />
+                            <Label Text="{Binding Role}" Style="{StaticResource BodyLabel}" />
+
+                            <HorizontalStackLayout Spacing="10">
+                                <Button Text="Deactivate"
+                                        Style="{StaticResource PrimaryButton}"
+                                        IsVisible="{Binding IsActive}"
+                                        Command="{Binding BindingContext.DeactivateCommand, Source={x:Reference RootPage}}"
+                                        CommandParameter="{Binding .}" />
+
+                                <Button Text="Reactivate"
+                                        Style="{StaticResource PrimaryButton}"
+                                        IsVisible="{Binding IsActive, Converter={StaticResource InvertedBoolConverter}}"
+                                        Command="{Binding BindingContext.ReactivateCommand, Source={x:Reference RootPage}}"
+                                        CommandParameter="{Binding .}" />
+                            </HorizontalStackLayout>
+
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+    </Grid>
+</ContentPage>

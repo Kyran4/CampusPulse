@@ -1,75 +1,59 @@
-﻿using CampusPulse.DTOs;
-using CampusPulse.Helpers;
 using CampusPulse.Models;
-using SQLite;
 
 namespace CampusPulse.Services;
 
 public class PostService
 {
-    private readonly SQLiteAsyncConnection _db;
+    private readonly ApiClient _api;
 
-    public PostService(DatabaseService database)
+    public PostService(ApiClient api)
     {
-        _db = database.Connection;
+        _api = api;
     }
 
-    public Task<List<Post>> GetFeedAsync()
+    public string? LastError => _api.LastError;
+
+    public async Task<List<Post>?> GetFeedAsync(int? categoryId = null)
     {
-        return _db.Table<Post>()
-            .Where(p => !p.IsHidden)
-            .OrderByDescending(p => p.CreatedDate)
-            .ToListAsync();
+        var url = categoryId.HasValue
+            ? $"api/posts/feed?categoryId={categoryId.Value}"
+            : "api/posts/feed";
+
+        return await _api.GetAsync<List<Post>>(url);
     }
 
-    public Task<List<Post>> GetPostsByUserAsync(int userId)
+    public async Task<List<Post>?> GetUserPostsAsync(int userId)
     {
-        return _db.Table<Post>()
-            .Where(p => p.UserId == userId)
-            .OrderByDescending(p => p.CreatedDate)
-            .ToListAsync();
+        return await _api.GetAsync<List<Post>>($"api/posts/user/{userId}");
     }
 
-    public async Task<bool> CreatePostAsync(PostCreateDto dto)
+    public async Task<Post?> GetPostAsync(int id)
     {
-        var user = SessionManager.CurrentUser;
-        if (user == null) return false;
-
-        var post = new Post
-        {
-            UserId = user.UserId,
-            Title = dto.Title,
-            Content = dto.Content,
-            CategoryId = dto.CategoryId
-        };
-
-        await _db.InsertAsync(post);
-        return true;
+        // There's no GET /api/posts/{id} on the API - the feed and
+        // user-posts endpoints are what exist, so pages that need a single
+        // post pull it from whichever list already has it. Kept as a
+        // fallback that searches the feed by id.
+        var feed = await GetFeedAsync();
+        return feed?.FirstOrDefault(p => p.PostId == id);
     }
 
-    public async Task<bool> UpdatePostAsync(Post post)
+    public async Task<Post?> CreatePostAsync(PostCreateDto dto)
     {
-        var user = SessionManager.CurrentUser;
-        if (user == null || user.UserId != post.UserId)
-            return false;
-
-        post.UpdatedDate = DateTime.UtcNow;
-        await _db.UpdateAsync(post);
-        return true;
+        return await _api.PostAsync<Post>("api/posts", dto);
     }
 
-    public async Task<bool> DeletePostAsync(int postId)
+    public async Task<Post?> UpdatePostAsync(int id, PostCreateDto dto)
     {
-        var post = await _db.Table<Post>().Where(p => p.PostId == postId).FirstOrDefaultAsync();
-        var user = SessionManager.CurrentUser;
+        return await _api.PutAsync<Post>($"api/posts/{id}", dto);
+    }
 
-        if (post == null || user == null)
-            return false;
+    public async Task<bool> DeletePostAsync(int id)
+    {
+        return await _api.DeleteAsync($"api/posts/{id}");
+    }
 
-        if (post.UserId != user.UserId && user.Role != "Admin")
-            return false;
-
-        await _db.DeleteAsync(post);
-        return true;
+    public async Task<bool> HidePostAsync(int id, string? reason)
+    {
+        return await _api.PutAsync($"api/posts/{id}/hide", new ModerationReasonDto { Reason = reason });
     }
 }

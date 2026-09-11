@@ -5,60 +5,34 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:views="clr-namespace:CampusPulse.Views">
 
-    <!-- MAIN TABS (Student Area) -->
-    <TabBar>
-        <ShellContent
-            Title="Feed"
-            Icon="icon_feed.png"
-            ContentTemplate="{DataTemplate views:FeedPage}" />
-
-        <ShellContent
-            Title="Events"
-            Icon="icon_events.png"
-            ContentTemplate="{DataTemplate views:EventsPage}" />
-
-        <ShellContent
-            Title="Create"
-            Icon="icon_create.png"
-            ContentTemplate="{DataTemplate views:CreatePostPage}" />
-
-        <ShellContent
-            Title="Profile"
-            Icon="icon_profile.png"
-            ContentTemplate="{DataTemplate views:ProfilePage}" />
-    </TabBar>
-
-    <!-- ADMIN FLYOUT -->
-    <FlyoutItem
-        Title="Admin Dashboard"
-        Icon="icon_admin.png"
-        Route="AdminDashboardPage"
-        FlyoutDisplayOptions="AsSingleItem">
-        <ShellContent ContentTemplate="{DataTemplate views:AdminDashboardPage}" />
+    <!-- Flyout Menu -->
+    <FlyoutItem Title="Feed" Icon="feed.png" Route="FeedPage">
+        <ShellContent Route="FeedPage" ContentTemplate="{DataTemplate views:FeedPage}" />
     </FlyoutItem>
 
-    <FlyoutItem
-        Title="Moderation"
-        Icon="icon_moderation.png"
-        Route="AdminModerationPage"
-        FlyoutDisplayOptions="AsSingleItem">
-        <ShellContent ContentTemplate="{DataTemplate views:AdminModerationPage}" />
+    <FlyoutItem Title="Events" Icon="events.png" Route="EventsPage">
+        <ShellContent Route="EventsPage" ContentTemplate="{DataTemplate views:EventsPage}" />
     </FlyoutItem>
 
-    <FlyoutItem
-        Title="Reports"
-        Icon="icon_reports.png"
-        Route="ReportsPage"
-        FlyoutDisplayOptions="AsSingleItem">
-        <ShellContent ContentTemplate="{DataTemplate views:ReportsPage}" />
+    <FlyoutItem Title="My Posts" Icon="posts.png" Route="MyPostsPage">
+        <ShellContent Route="MyPostsPage" ContentTemplate="{DataTemplate views:MyPostsPage}" />
     </FlyoutItem>
 
-    <FlyoutItem
-        Title="About"
-        Icon="icon_info.png"
-        Route="AboutPage"
-        FlyoutDisplayOptions="AsSingleItem">
-        <ShellContent ContentTemplate="{DataTemplate views:AboutPage}" />
+    <FlyoutItem Title="Profile" Icon="profile.png" Route="ProfilePage">
+        <ShellContent Route="ProfilePage" ContentTemplate="{DataTemplate views:ProfilePage}" />
     </FlyoutItem>
+
+    <!-- Standalone Routes - FlyoutItemIsVisible="False" keeps these out of
+         the flyout menu entirely. Without it, Shell auto-wraps every
+         top-level ShellContent into its own visible, tappable flyout entry -
+         which is why Login/Register (and these others) were showing up and
+         staying clickable regardless of the runtime show/hide logic in
+         AppShell.xaml.cs. These pages are only ever reached via GoToAsync. -->
+    <ShellContent Route="CreatePostPage" Shell.FlyoutItemIsVisible="False" ContentTemplate="{DataTemplate views:CreatePostPage}" />
+    <ShellContent Route="EventDetailsPage" Shell.FlyoutItemIsVisible="False" ContentTemplate="{DataTemplate views:EventDetailsPage}" />
+    <ShellContent Route="PostDetailsPage" Shell.FlyoutItemIsVisible="False" ContentTemplate="{DataTemplate views:PostDetailsPage}" />
+    <ShellContent Route="RegisterPage" Shell.FlyoutItemIsVisible="False" ContentTemplate="{DataTemplate views:RegisterPage}" />
+    <ShellContent Route="LoginPage" Shell.FlyoutItemIsVisible="False" ContentTemplate="{DataTemplate views:LoginPage}" />
+    <ShellContent Route="CreateEventPage" Shell.FlyoutItemIsVisible="False" ContentTemplate="{DataTemplate views:CreateEventPage}" />
 
 </Shell>

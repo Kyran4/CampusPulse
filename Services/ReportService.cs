@@ -1,61 +1,30 @@
-﻿using CampusPulse.DTOs;
-using CampusPulse.Helpers;
 using CampusPulse.Models;
-using SQLite;
 
 namespace CampusPulse.Services;
 
 public class ReportService
 {
-    private readonly SQLiteAsyncConnection _db;
+    private readonly ApiClient _api;
 
-    public ReportService(DatabaseService database)
+    public ReportService(ApiClient api)
     {
-        _db = database.Connection;
+        _api = api;
     }
 
-    public async Task<bool> CreateReportAsync(ReportCreateDto dto)
+    // Admin-only on the API side - see ReportsController.
+    public async Task<List<Report>?> GetReportsAsync(string? status = null)
     {
-        var user = SessionManager.CurrentUser;
-        if (user == null) return false;
-
-        var report = new Report
-        {
-            ReportedByUserId = user.UserId,
-            PostId = dto.PostId,
-            CommentId = dto.CommentId,
-            Reason = dto.Reason
-        };
-
-        await _db.InsertAsync(report);
-        return true;
+        var url = string.IsNullOrWhiteSpace(status) ? "api/reports" : $"api/reports?status={status}";
+        return await _api.GetAsync<List<Report>>(url);
     }
 
-    public Task<List<Report>> GetPendingReportsAsync()
+    public async Task<Report?> CreateReportAsync(ReportCreateDto dto)
     {
-        return _db.Table<Report>()
-            .Where(r => r.Status == "Pending")
-            .OrderBy(r => r.CreatedDate)
-            .ToListAsync();
+        return await _api.PostAsync<Report>("api/reports", dto);
     }
 
-    public async Task<bool> UpdateReportStatusAsync(int reportId, string status)
+    public async Task<Report?> ReviewReportAsync(int id, ReportReviewDto dto)
     {
-        var admin = SessionManager.CurrentUser;
-        if (admin == null || admin.Role != "Admin")
-            return false;
-
-        var report = await _db.Table<Report>()
-            .Where(r => r.ReportId == reportId)
-            .FirstOrDefaultAsync();
-
-        if (report == null)
-            return false;
-
-        report.Status = status;
-        report.ReviewedBy = admin.UserId;
-
-        await _db.UpdateAsync(report);
-        return true;
+        return await _api.PutAsync<Report>($"api/reports/{id}/review", dto);
     }
 }

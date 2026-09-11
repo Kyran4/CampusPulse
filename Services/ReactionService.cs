@@ -1,49 +1,30 @@
-﻿using CampusPulse.Helpers;
 using CampusPulse.Models;
-using SQLite;
 
 namespace CampusPulse.Services;
 
 public class ReactionService
 {
-    private readonly SQLiteAsyncConnection _db;
+    public const string Like = "Like";
+    public const string Helpful = "Helpful";
+    public const string Interested = "Interested";
 
-    public ReactionService(DatabaseService database)
+    private readonly ApiClient _api;
+
+    public ReactionService(ApiClient api)
     {
-        _db = database.Connection;
+        _api = api;
     }
 
-    public async Task<bool> ReactAsync(int postId, string type)
+    // Posting the same type again toggles it off server-side; a different
+    // type replaces the previous one. Either way the caller should reload
+    // the post afterwards to see the updated reaction state.
+    public async Task<bool> AddReactionAsync(ReactionCreateDto dto)
     {
-        var user = SessionManager.CurrentUser;
-        if (user == null) return false;
-
-        var existing = await _db.Table<Reaction>()
-            .Where(r => r.PostId == postId && r.UserId == user.UserId)
-            .FirstOrDefaultAsync();
-
-        if (existing != null)
-        {
-            existing.ReactionType = type;
-            await _db.UpdateAsync(existing);
-        }
-        else
-        {
-            await _db.InsertAsync(new Reaction
-            {
-                PostId = postId,
-                UserId = user.UserId,
-                ReactionType = type
-            });
-        }
-
-        return true;
+        return await _api.PostAsync("api/reactions", dto);
     }
 
-    public Task<int> CountReactionsAsync(int postId)
+    public async Task<List<Reaction>?> GetReactionsAsync(int postId)
     {
-        return _db.Table<Reaction>()
-            .Where(r => r.PostId == postId)
-            .CountAsync();
+        return await _api.GetAsync<List<Reaction>>($"api/reactions/{postId}");
     }
 }

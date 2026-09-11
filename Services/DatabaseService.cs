@@ -1,192 +1,97 @@
-using SQLite;
-using CampusPulse.Models;
-using CampusPulse.Helpers;
+using System.Text.Json;
 
 namespace CampusPulse.Services;
 
 public class DatabaseService
 {
-    private readonly SQLiteAsyncConnection _db;
-
-    public DatabaseService()
+    private readonly JsonSerializerOptions _jsonOptions = new()
     {
-        var dbPath = GetDatabasePath();
-        _db = new SQLiteAsyncConnection(dbPath);
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = false
+    };
 
-        Initialize().Wait();
+    private string GetPath(string filename)
+    {
+        return Path.Combine(FileSystem.AppDataDirectory, filename);
     }
 
-    private string GetDatabasePath()
+    // ============================
+    // JWT Token Storage
+    // ============================
+    // Preferences instead of SecureStorage: SecureStorage on Windows is
+    // backed by PasswordVault, which requires the app to have a packaged
+    // identity (MSIX). Most dev/debug runs are unpackaged, and in that case
+    // SecureStorage silently fails to persist - GetTokenAsync comes back
+    // null even right after a successful SetAsync. That means ApiAuthHandler
+    // never attaches a token, so every [Authorize] endpoint 401s while
+    // [AllowAnonymous] ones keep working - exactly the split between what
+    // was/wasn't working. Preferences isn't encrypted, but for local-device
+    // storage of a short-lived JWT in a student project this is a
+    // reasonable trade for something that actually works on every platform
+    // without extra packaging setup.
+    public async Task SaveTokenAsync(string token)
     {
-#if DEBUG
-        // Developer mode – easy to inspect
-        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "campuspulse_dev.db");
-#else
-        // Production mode – secure app data storage
-        return Path.Combine(FileSystem.AppDataDirectory, "campuspulse.db");
-#endif
+        Preferences.Default.Set("jwt_token", token);
+        await Task.CompletedTask;
     }
 
-    private async Task Initialize()
+    public async Task<string?> GetTokenAsync()
     {
-        await _db.CreateTableAsync<User>();
-        await _db.CreateTableAsync<Post>();
-        await _db.CreateTableAsync<Comment>();
-        await _db.CreateTableAsync<Reaction>();
-        await _db.CreateTableAsync<Event>();
-        await _db.CreateTableAsync<EventRegistration>();
-        await _db.CreateTableAsync<Report>();
-        await _db.CreateTableAsync<Category>();
-
-        await SeedData();
+        var token = Preferences.Default.Get("jwt_token", string.Empty);
+        await Task.CompletedTask;
+        return string.IsNullOrEmpty(token) ? null : token;
     }
 
-    private async Task SeedData()
+    public void ClearToken()
     {
-        // Only seed if empty
-        if (await _db.Table<User>().CountAsync() > 0)
-            return;
-
-        // Seed categories
-        var categories = new List<Category>
-        {
-            new() { Name = "Clubs" },
-            new() { Name = "Sports" },
-            new() { Name = "Academic" },
-            new() { Name = "Social" },
-            new() { Name = "Announcements" }
-        };
-
-        await _db.InsertAllAsync(categories);
-
-        // Seed users
-        var admin = new User
-        {
-            DisplayName = "Admin",
-            Email = "admin@campuspulse.com",
-            PasswordHash = PasswordHasher.Hash("Admin123!"),
-            Role = "Admin",
-            IsActive = true
-        };
-
-        var student1 = new User
-        {
-            DisplayName = "Kyran",
-            Email = "kyran@student.com",
-            PasswordHash = PasswordHasher.Hash("Password123!"),
-            Role = "Student",
-            IsActive = true
-        };
-
-        var student2 = new User
-        {
-            DisplayName = "Ava",
-            Email = "ava@student.com",
-            PasswordHash = PasswordHasher.Hash("Password123!"),
-            Role = "Student",
-            IsActive = true
-        };
-
-        var student3 = new User
-        {
-            DisplayName = "Liam",
-            Email = "liam@student.com",
-            PasswordHash = PasswordHasher.Hash("Password123!"),
-            Role = "Student",
-            IsActive = true
-        };
-
-        await _db.InsertAsync(admin);
-        await _db.InsertAsync(student1);
-        await _db.InsertAsync(student2);
-        await _db.InsertAsync(student3);
-
-        // Seed events
-        var events = new List<Event>
-        {
-            new()
-            {
-                Title = "Coding Club Meetup",
-                Description = "Weekly coding meetup for all skill levels.",
-                Date = DateTime.Now.AddDays(3),
-                Location = "Room B201",
-                CategoryId = 1,
-                CreatedBy = admin.UserId,
-                Capacity = 30
-            },
-            new()
-            {
-                Title = "Basketball Tryouts",
-                Description = "Open tryouts for the campus basketball team.",
-                Date = DateTime.Now.AddDays(5),
-                Location = "Gym Hall",
-                CategoryId = 2,
-                CreatedBy = admin.UserId,
-                Capacity = 20
-            },
-            new()
-            {
-                Title = "Study Skills Workshop",
-                Description = "Improve your study habits and exam performance.",
-                Date = DateTime.Now.AddDays(7),
-                Location = "Library Conference Room",
-                CategoryId = 3,
-                CreatedBy = admin.UserId,
-                Capacity = 50
-            }
-        };
-
-        await _db.InsertAllAsync(events);
-
-        // Seed posts
-        var posts = new List<Post>
-        {
-            new()
-            {
-                UserId = student1.UserId,
-                Title = "Join the Coding Club!",
-                Content = "We meet every Wednesday. All levels welcome!",
-                CategoryId = 1
-            },
-            new()
-            {
-                UserId = student2.UserId,
-                Title = "Basketball Tryouts Soon",
-                Content = "Get ready for the big day!",
-                CategoryId = 2
-            },
-            new()
-            {
-                UserId = student3.UserId,
-                Title = "Study Workshop",
-                Content = "Don't miss this helpful session.",
-                CategoryId = 3
-            }
-        };
-
-        await _db.InsertAllAsync(posts);
-
-        // Seed comments
-        var comments = new List<Comment>
-        {
-            new() { PostId = 1, UserId = student2.UserId, Content = "Sounds awesome!" },
-            new() { PostId = 1, UserId = student3.UserId, Content = "I'll be there!" },
-            new() { PostId = 2, UserId = student1.UserId, Content = "Good luck everyone!" }
-        };
-
-        await _db.InsertAllAsync(comments);
-
-        // Seed reactions
-        var reactions = new List<Reaction>
-        {
-            new() { PostId = 1, UserId = student1.UserId, ReactionType = "Like" },
-            new() { PostId = 1, UserId = student2.UserId, ReactionType = "Helpful" },
-            new() { PostId = 2, UserId = student3.UserId, ReactionType = "Interested" }
-        };
-
-        await _db.InsertAllAsync(reactions);
+        Preferences.Default.Remove("jwt_token");
     }
 
-    // Expose DB for services
-    public SQLiteAsyncConnection Connection => _db;
+    // ============================
+    // User Storage
+    // ============================
+    public async Task SaveUserAsync(object user)
+    {
+        var json = JsonSerializer.Serialize(user, _jsonOptions);
+        File.WriteAllText(GetPath("user.json"), json);
+    }
+
+    public T? LoadUser<T>()
+    {
+        var path = GetPath("user.json");
+        if (!File.Exists(path)) return default;
+
+        var json = File.ReadAllText(path);
+        return JsonSerializer.Deserialize<T>(json, _jsonOptions);
+    }
+
+    public void ClearUser()
+    {
+        var path = GetPath("user.json");
+        if (File.Exists(path)) File.Delete(path);
+    }
+
+    // ============================
+    // Generic JSON Cache
+    // ============================
+    public void SaveCache<T>(string key, T data)
+    {
+        var json = JsonSerializer.Serialize(data, _jsonOptions);
+        File.WriteAllText(GetPath($"{key}.json"), json);
+    }
+
+    public T? LoadCache<T>(string key)
+    {
+        var path = GetPath($"{key}.json");
+        if (!File.Exists(path)) return default;
+
+        var json = File.ReadAllText(path);
+        return JsonSerializer.Deserialize<T>(json, _jsonOptions);
+    }
+
+    public void ClearCache(string key)
+    {
+        var path = GetPath($"{key}.json");
+        if (File.Exists(path)) File.Delete(path);
+    }
 }

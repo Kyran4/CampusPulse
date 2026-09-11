@@ -1,62 +1,24 @@
-﻿using CampusPulse.DTOs;
-using CampusPulse.Helpers;
-using CampusPulse.Models;
-using SQLite;
+﻿using CampusPulse.Models;
+using CampusPulse.Services;
 
 namespace CampusPulse.Services;
 
 public class AuthenticationService
 {
-    private readonly SQLiteAsyncConnection _db;
+    private readonly ApiClient _api;
 
-    public AuthenticationService(DatabaseService database)
+    public AuthenticationService(ApiClient api)
     {
-        _db = database.Connection;
+        _api = api;
     }
 
-    public async Task<User> LoginAsync(LoginRequest request)
+    public async Task<AuthResponseDto?> LoginAsync(LoginRequest dto)
     {
-        var user = await _db.Table<User>()
-            .Where(u => u.Email == request.Email)
-            .FirstOrDefaultAsync();
-
-        if (user == null)
-            return null;
-
-        if (!PasswordHasher.Verify(request.Password, user.PasswordHash))
-            return null;
-
-        if (!user.IsActive)
-            return null;
-
-        SessionManager.CurrentUser = user;
-        return user;
+        return await _api.PostAsync<AuthResponseDto>("api/auth/login", dto);
     }
 
-    public async Task<bool> RegisterAsync(RegisterRequest request)
+    public async Task<AuthResponseDto?> RegisterAsync(RegisterRequest dto)
     {
-        var exists = await _db.Table<User>()
-            .Where(u => u.Email == request.Email)
-            .FirstOrDefaultAsync();
-
-        if (exists != null)
-            return false;
-
-        var newUser = new User
-        {
-            DisplayName = request.DisplayName,
-            Email = request.Email,
-            PasswordHash = PasswordHasher.Hash(request.Password),
-            Role = "Student",
-            IsActive = true
-        };
-
-        await _db.InsertAsync(newUser);
-        return true;
-    }
-
-    public void Logout()
-    {
-        SessionManager.CurrentUser = null;
+        return await _api.PostAsync<AuthResponseDto>("api/auth/register", dto);
     }
 }

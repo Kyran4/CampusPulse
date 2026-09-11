@@ -1,41 +1,115 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!-- PAGE BACKGROUND -->
-    <Style TargetType="ContentPage">
-        <Setter Property="BackgroundColor"
-                Value="{AppThemeBinding Light={StaticResource LightBackground},
-                                   Dark={StaticResource DarkBackground}}" />
-        <Setter Property="Padding" Value="16" />
+    <!-- ========================= -->
+    <!--        LABEL STYLES       -->
+    <!-- ========================= -->
+
+    <Style x:Key="TitleLabel" TargetType="Label">
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{DynamicResource TextColor}" />
+        <Setter Property="Margin" Value="0,10,0,10" />
     </Style>
 
-    <!-- LABELS -->
-    <Style TargetType="Label">
-        <Setter Property="TextColor"
-                Value="{AppThemeBinding Light={StaticResource LightText},
-                                   Dark={StaticResource DarkText}}" />
+    <Style x:Key="BodyLabel" TargetType="Label">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="TextColor" Value="{DynamicResource TextColor}" />
+        <Setter Property="Margin" Value="0,4,0,4" />
     </Style>
 
-    <!-- CARDS -->
-    <Style TargetType="Frame">
-        <Setter Property="BackgroundColor"
-                Value="{AppThemeBinding Light={StaticResource LightCard},
-                                   Dark={StaticResource DarkCard}}" />
-        <Setter Property="CornerRadius" Value="16" />
-        <Setter Property="HasShadow" Value="True" />
-        <Setter Property="Padding" Value="16" />
-        <Setter Property="Margin" Value="0,10" />
+    <Style x:Key="CaptionLabel" TargetType="Label">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="TextColor" Value="{DynamicResource LightGray}" />
     </Style>
 
-    <!-- BUTTONS -->
-    <Style TargetType="Button">
-        <Setter Property="BackgroundColor"
-                Value="{AppThemeBinding Light={StaticResource LightAccent},
-                                   Dark={StaticResource DarkAccent}}" />
+    <!-- ========================= -->
+    <!--        BUTTON STYLES      -->
+    <!-- ========================= -->
+
+    <Style x:Key="PrimaryButton" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="{DynamicResource PrimaryColor}" />
         <Setter Property="TextColor" Value="White" />
-        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="CornerRadius" Value="8" />
         <Setter Property="Padding" Value="12,8" />
+        <Setter Property="FontAttributes" Value="Bold" />
+    </Style>
+
+    <Style x:Key="SecondaryButton" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="{DynamicResource SecondaryColor}" />
+        <Setter Property="TextColor" Value="White" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="FontAttributes" Value="Bold" />
+    </Style>
+
+    <Style x:Key="DangerButton" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="#DC2626" />
+        <!-- Red 600 -->
+        <Setter Property="TextColor" Value="White" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="FontAttributes" Value="Bold" />
+    </Style>
+
+    <!-- ========================= -->
+    <!--        ENTRY STYLES       -->
+    <!-- ========================= -->
+
+    <Style x:Key="InputField" TargetType="Entry">
+        <Setter Property="BackgroundColor" Value="{DynamicResource CardBackground}" />
+        <Setter Property="TextColor" Value="{DynamicResource TextColor}" />
+        <Setter Property="PlaceholderColor" Value="{DynamicResource LightGray}" />
+        <Setter Property="Margin" Value="0,6,0,6" />
+        <Setter Property="HeightRequest" Value="44" />
+    </Style>
+
+    <!-- ========================= -->
+    <!--        FRAME STYLES       -->
+    <!-- ========================= -->
+
+    <Style x:Key="Card" TargetType="Frame">
+        <Setter Property="BackgroundColor" Value="{DynamicResource CardBackground}" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="HasShadow" Value="True" />
+        <Setter Property="BorderColor" Value="{DynamicResource LightGray}" />
+        <Setter Property="Margin" Value="0,8,0,8" />
+    </Style>
+
+    <!-- ========================= -->
+    <!--     COLLECTIONVIEW        -->
+    <!-- ========================= -->
+
+    <Style TargetType="CollectionView">
+        <Setter Property="ItemsLayout">
+            <Setter.Value>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="12" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ========================= -->
+    <!--        PAGE HEADER        -->
+    <!-- ========================= -->
+
+    <Style x:Key="PageHeader" TargetType="Label">
+        <Setter Property="FontSize" Value="28" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{DynamicResource TextColor}" />
+        <Setter Property="Margin" Value="0,20,0,10" />
+    </Style>
+
+    <!-- ========================= -->
+    <!--        SHELL STYLES       -->
+    <!-- ========================= -->
+
+    <Style TargetType="Shell">
+        <Setter Property="BackgroundColor" Value="{DynamicResource PrimaryColor}" />
+        <Setter Property="ForegroundColor" Value="{DynamicResource FlyoutTextColor}" />
+        <Setter Property="TitleColor" Value="{DynamicResource FlyoutTextColor}" />
     </Style>
 
 </ResourceDictionary>

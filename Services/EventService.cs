@@ -1,81 +1,55 @@
-﻿using CampusPulse.DTOs;
-using CampusPulse.Helpers;
 using CampusPulse.Models;
-using SQLite;
 
 namespace CampusPulse.Services;
 
 public class EventService
 {
-    private readonly SQLiteAsyncConnection _db;
+    private readonly ApiClient _api;
 
-    public EventService(DatabaseService database)
+    public EventService(ApiClient api)
     {
-        _db = database.Connection;
+        _api = api;
     }
 
-    public Task<List<Event>> GetEventsAsync()
+    public async Task<List<Event>?> GetEventsAsync()
     {
-        return _db.Table<Event>()
-            .OrderBy(e => e.Date)
-            .ToListAsync();
+        return await _api.GetAsync<List<Event>>("api/events");
     }
 
-    public async Task<bool> CreateEventAsync(EventCreateDto dto)
+    public async Task<Event?> GetEventAsync(int id)
     {
-        var user = SessionManager.CurrentUser;
-        if (user == null || user.Role != "Admin")
-            return false;
-
-        var ev = new Event
-        {
-            Title = dto.Title,
-            Description = dto.Description,
-            Date = dto.Date,
-            Location = dto.Location,
-            CategoryId = dto.CategoryId,
-            Capacity = dto.Capacity,
-            CreatedBy = user.UserId
-        };
-
-        await _db.InsertAsync(ev);
-        return true;
+        return await _api.GetAsync<Event>($"api/events/{id}");
     }
 
-    public async Task<bool> JoinEventAsync(int eventId)
+    public async Task<List<User>?> GetAttendeesAsync(int eventId)
     {
-        var user = SessionManager.CurrentUser;
-        if (user == null) return false;
-
-        var exists = await _db.Table<EventRegistration>()
-            .Where(r => r.EventId == eventId && r.UserId == user.UserId)
-            .FirstOrDefaultAsync();
-
-        if (exists != null)
-            return false;
-
-        await _db.InsertAsync(new EventRegistration
-        {
-            EventId = eventId,
-            UserId = user.UserId
-        });
-
-        return true;
+        return await _api.GetAsync<List<User>>($"api/events/{eventId}/attendees");
     }
 
-    public async Task<bool> LeaveEventAsync(int eventId)
+    public async Task<bool> JoinEventAsync(EventJoinDto dto)
     {
-        var user = SessionManager.CurrentUser;
-        if (user == null) return false;
+        return await _api.PostAsync("api/events/join", dto);
+    }
 
-        var reg = await _db.Table<EventRegistration>()
-            .Where(r => r.EventId == eventId && r.UserId == user.UserId)
-            .FirstOrDefaultAsync();
+    public async Task<bool> LeaveEventAsync(EventJoinDto dto)
+    {
+        return await _api.PostAsync("api/events/leave", dto);
+    }
 
-        if (reg == null)
-            return false;
+    // ---- Admin ----
 
-        await _db.DeleteAsync(reg);
-        return true;
+    public async Task<Event?> CreateEventAsync(EventCreateDto dto)
+    {
+        return await _api.PostAsync<Event>("api/events", dto);
+    }
+
+    public async Task<Event?> UpdateEventAsync(int id, EventCreateDto dto)
+    {
+        return await _api.PutAsync<Event>($"api/events/{id}", dto);
+    }
+
+    public async Task<bool> CancelEventAsync(int id)
+    {
+        return await _api.PutAsync($"api/events/{id}/cancel", new { });
     }
 }

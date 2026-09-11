@@ -1,17 +1,36 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!-- Light Theme Colors -->
-    <Color x:Key="LightBackground">#FFFFFF</Color>
-    <Color x:Key="LightCard">#F5F5F5</Color>
-    <Color x:Key="LightText">#222222</Color>
-    <Color x:Key="LightAccent">#3B82F6</Color>
+    <!-- LIGHT THEME COLORS -->
+    <Color x:Key="PrimaryColorLight">#2563EB</Color>
+    <Color x:Key="SecondaryColorLight">#1E40AF</Color>
+    <Color x:Key="LightGrayLight">#F3F4F6</Color>
+    <Color x:Key="BackgroundColorLight">#FFFFFF</Color>
+    <Color x:Key="CardBackgroundLight">#FFFFFF</Color>
+    <Color x:Key="TextColorLight">#1F2937</Color>
+    <Color x:Key="FlyoutTextColorLight">#FFFFFF</Color>
+    <Color x:Key="AccentColorLight">#3B82F6</Color>
 
-    <!-- Dark Theme Colors -->
-    <Color x:Key="DarkBackground">#121212</Color>
-    <Color x:Key="DarkCard">#1E1E1E</Color>
-    <Color x:Key="DarkText">#E5E5E5</Color>
-    <Color x:Key="DarkAccent">#60A5FA</Color>
+    <!-- DARK THEME COLORS -->
+    <Color x:Key="PrimaryColorDark">#1E3A8A</Color>
+    <Color x:Key="SecondaryColorDark">#1E40AF</Color>
+    <Color x:Key="LightGrayDark">#374151</Color>
+    <Color x:Key="BackgroundColorDark">#0F172A</Color>
+    <Color x:Key="CardBackgroundDark">#1E293B</Color>
+    <Color x:Key="TextColorDark">#E5E7EB</Color>
+    <Color x:Key="FlyoutTextColorDark">#E5E7EB</Color>
+    <Color x:Key="AccentColorDark">#60A5FA</Color>
+
+    <!-- ACTIVE COLORS (THESE WILL BE SET IN C#) -->
+    <Color x:Key="PrimaryColor">#2563EB</Color>
+    <Color x:Key="SecondaryColor">#1E40AF</Color>
+    <Color x:Key="LightGray">#F3F4F6</Color>
+    <Color x:Key="BackgroundColor">#FFFFFF</Color>
+    <Color x:Key="CardBackground">#FFFFFF</Color>
+    <Color x:Key="TextColor">#1F2937</Color>
+    <Color x:Key="FlyoutTextColor">#FFFFFF</Color>
+    <Color x:Key="AccentColor">#3B82F6</Color>
 
 </ResourceDictionary>

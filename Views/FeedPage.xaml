@@ -1,12 +1,73 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="CampusPulse.Views.FeedPage"
-             Title="FeedPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+<ContentPage
+    x:Class="CampusPulse.Views.FeedPage"
+    x:Name="RootPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="{StaticResource LightGray}">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*">
+
+        <!-- Header -->
+        <Grid BackgroundColor="{StaticResource PrimaryColor}" Padding="20">
+            <Label Text="Campus Feed" Style="{StaticResource TitleLabel}" />
+        </Grid>
+
+        <!-- Category Filter - US-10 -->
+        <Grid Padding="20,10" Grid.Row="1">
+            <Picker Title="All Categories"
+                    ItemsSource="{Binding Categories}"
+                    ItemDisplayBinding="{Binding Name}"
+                    SelectedItem="{Binding SelectedCategory}" />
+        </Grid>
+
+        <!-- Create Post Button -->
+        <Grid Padding="20,0,20,10" Grid.Row="2">
+            <Button
+                Text="Create Post"
+                Style="{StaticResource PrimaryButton}"
+                Command="{Binding CreatePostCommand}" />
+        </Grid>
+
+        <!-- Feed -->
+        <CollectionView
+            Grid.Row="3"
+            ItemsSource="{Binding Posts}"
+            SelectionMode="None"
+            Margin="20">
+
+            <CollectionView.EmptyView>
+                <Label Text="No posts yet. Be the first to create one!"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       TextColor="{StaticResource SecondaryColor}" />
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Style="{StaticResource Card}">
+                        <VerticalStackLayout Spacing="10">
+
+                            <Label Text="{Binding Title}"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource SecondaryColor}" />
+
+                            <Label Text="{Binding Content}"
+                                   Style="{StaticResource BodyLabel}" />
+
+                            <Button
+                                Text="View Post"
+                                Style="{StaticResource PrimaryButton}"
+                                Command="{Binding BindingContext.OpenPostCommand, Source={x:Reference RootPage}}"
+                                CommandParameter="{Binding .}" />
+
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+    </Grid>
 </ContentPage>
