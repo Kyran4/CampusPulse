@@ -1,84 +1,93 @@
 <?xml version="1.0" encoding="utf-8" ?>
-
 <ContentPage
     x:Class="CampusPulse.Views.FeedPage"
+    x:Name="RootPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Feed">
+    BackgroundColor="{StaticResource LightGray}">
 
-    <Grid
-        Padding="20"
-        RowDefinitions="Auto,Auto,*"
-        RowSpacing="10">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
 
-        <Label
-            Grid.Row="0"
-            Text="Campus Feed"
-            FontSize="28"
-            FontAttributes="Bold" />
+        <!-- Header -->
+        <Grid BackgroundColor="{StaticResource PrimaryColor}" Padding="20">
+            <Label Text="Campus Feed" Style="{StaticResource TitleLabel}" />
+        </Grid>
 
-        <Label
-            Grid.Row="1"
-            Text="See the latest posts and updates from around campus."
-            FontSize="14"
-            TextColor="Gray"
-            Margin="0,0,0,10" />
+        <!-- Category Filter - US-10 -->
+        <Grid Padding="20,10" Grid.Row="1">
+            <Picker Title="All Categories"
+                    ItemsSource="{Binding Categories}"
+                    ItemDisplayBinding="{Binding Name}"
+                    SelectedItem="{Binding SelectedCategory}"
+                    IsEnabled="{Binding ShowFollowingOnly, Converter={StaticResource InvertedBoolConverter}}" />
+        </Grid>
 
+        <!-- Following filter - change request: view content relevant to
+             followed interests, right in the campus feed. -->
+        <Grid Padding="20,0" Grid.Row="2" ColumnDefinitions="*,Auto">
+            <HorizontalStackLayout Grid.Column="0" Spacing="10" VerticalOptions="Center">
+                <Switch IsToggled="{Binding ShowFollowingOnly}" />
+                <Label Text="Following only" VerticalOptions="Center" Style="{StaticResource BodyLabel}" />
+            </HorizontalStackLayout>
+
+            <Button Grid.Column="1"
+                    Text="My Interests"
+                    Style="{StaticResource PrimaryButton}"
+                    Command="{Binding ManageInterestsCommand}" />
+        </Grid>
+
+        <!-- Create Post Button -->
+        <Grid Padding="20,10,20,10" Grid.Row="3">
+            <Button
+                Text="Create Post"
+                Style="{StaticResource PrimaryButton}"
+                Command="{Binding CreatePostCommand}" />
+        </Grid>
+
+        <!-- Feed -->
         <CollectionView
-            Grid.Row="2"
-            ItemsSource="{Binding Posts}">
+            Grid.Row="4"
+            ItemsSource="{Binding Posts}"
+            SelectionMode="None"
+            Margin="20">
+
+            <CollectionView.EmptyView>
+                <Label Text="No posts here yet."
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       TextColor="{StaticResource SecondaryColor}" />
+            </CollectionView.EmptyView>
 
             <CollectionView.ItemTemplate>
-
                 <DataTemplate>
+                    <Frame Style="{StaticResource Card}">
+                        <VerticalStackLayout Spacing="10">
 
-                    <Border
-                        Stroke="#DDDDDD"
-                        StrokeThickness="1"
-                        Padding="15"
-                        Margin="0,6">
+                            <Image Source="{Binding ImageBase64, Converter={StaticResource ImageConverter}}"
+                                   Aspect="AspectFill"
+                                   HeightRequest="160"
+                                   IsVisible="{Binding ImageBase64, Converter={StaticResource HasImageConverter}}" />
 
-                        <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="12" />
-                        </Border.StrokeShape>
+                            <Label Text="{Binding Title}"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource SecondaryColor}" />
 
-                        <VerticalStackLayout Spacing="8">
+                            <Label Text="{Binding Content}"
+                                   Style="{StaticResource BodyLabel}" />
 
-                            <Grid ColumnDefinitions="*,Auto">
-
-                                <Label
-                                    Grid.Column="0"
-                                    Text="{Binding Category}"
-                                    FontSize="13"
-                                    TextColor="Gray" />
-
-                                <Label
-                                    Grid.Column="1"
-                                    Text="{Binding Date}"
-                                    FontSize="13"
-                                    TextColor="Gray" />
-
-                            </Grid>
-
-                            <Label
-                                Text="{Binding Title}"
-                                FontSize="20"
-                                FontAttributes="Bold" />
-
-                            <Label
-                                Text="{Binding Content}"
-                                FontSize="15" />
+                            <Button
+                                Text="View Post"
+                                Style="{StaticResource PrimaryButton}"
+                                Command="{Binding BindingContext.OpenPostCommand, Source={x:Reference RootPage}}"
+                                CommandParameter="{Binding .}" />
 
                         </VerticalStackLayout>
-
-                    </Border>
-
+                    </Frame>
                 </DataTemplate>
-
             </CollectionView.ItemTemplate>
 
         </CollectionView>
 
     </Grid>
-
 </ContentPage>

@@ -1,12 +1,67 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="CampusPulse.Views.CreatePostPage"
-             Title="CreatePostPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+<ContentPage
+    x:Class="CampusPulse.Views.CreatePostPage"
+    x:Name="RootPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="{StaticResource LightGray}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- HEADER -->
+        <Grid BackgroundColor="{StaticResource PrimaryColor}" Padding="20">
+            <Label Text="{Binding PageTitle}" Style="{StaticResource TitleLabel}" />
+        </Grid>
+
+        <!-- CONTENT -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="20" Spacing="20">
+
+                <!-- Title -->
+                <Frame Style="{StaticResource Card}" Padding="0" CornerRadius="10">
+                    <Entry Placeholder="Title"
+                           Text="{Binding Title}"
+                           Style="{StaticResource InputField}" />
+                </Frame>
+
+                <!-- Content -->
+                <Frame Style="{StaticResource Card}" Padding="10" CornerRadius="10">
+                    <Editor Placeholder="Write your post..."
+                            Text="{Binding Content}"
+                            AutoSize="TextChanges"
+                            HeightRequest="150" />
+                </Frame>
+
+                <!-- Category Picker -->
+                <Picker Title="Select Category"
+                        ItemsSource="{Binding Categories}"
+                        ItemDisplayBinding="{Binding Name}"
+                        SelectedItem="{Binding SelectedCategory}" />
+
+                <!-- Image (optional) -->
+                <Image Source="{Binding ImageBase64, Converter={StaticResource ImageConverter}}"
+                       Aspect="AspectFill"
+                       HeightRequest="180"
+                       IsVisible="{Binding ImageBase64, Converter={StaticResource HasImageConverter}}" />
+
+                <HorizontalStackLayout Spacing="10">
+                    <Button Text="{Binding PickImageButtonText}"
+                            Style="{StaticResource PrimaryButton}"
+                            Command="{Binding BindingContext.PickImageCommand, Source={x:Reference RootPage}}" />
+
+                    <Button Text="Remove Image"
+                            Style="{StaticResource PrimaryButton}"
+                            IsVisible="{Binding ImageBase64, Converter={StaticResource HasImageConverter}}"
+                            Command="{Binding BindingContext.RemoveImageCommand, Source={x:Reference RootPage}}" />
+                </HorizontalStackLayout>
+
+                <!-- Publish / Save Button -->
+                <Button Text="{Binding SaveButtonText}"
+                        Style="{StaticResource PrimaryButton}"
+                        Command="{Binding BindingContext.CreateCommand, Source={x:Reference RootPage}}" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
 </ContentPage>

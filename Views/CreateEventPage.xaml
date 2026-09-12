@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="CampusPulse.Views.CreateEventPage"
+    x:Name="RootPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="{StaticResource LightGray}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <Grid BackgroundColor="{StaticResource PrimaryColor}" Padding="20">
+            <Label Text="Create Event" Style="{StaticResource TitleLabel}" />
+        </Grid>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="20" Spacing="16">
+
+                <Frame Style="{StaticResource Card}" Padding="0" CornerRadius="10">
+                    <Entry Placeholder="Title"
+                           Text="{Binding Title}"
+                           Style="{StaticResource InputField}" />
+                </Frame>
+
+                <Frame Style="{StaticResource Card}" Padding="10" CornerRadius="10">
+                    <Editor Placeholder="Description"
+                            Text="{Binding Description}"
+                            AutoSize="TextChanges"
+                            HeightRequest="120" />
+                </Frame>
+
+                <Frame Style="{StaticResource Card}" Padding="0" CornerRadius="10">
+                    <Entry Placeholder="Location"
+                           Text="{Binding Location}"
+                           Style="{StaticResource InputField}" />
+                </Frame>
+
+                <Label Text="Date" Style="{StaticResource SectionHeader}" />
+                <DatePicker Date="{Binding Date}" />
+
+                <Label Text="Time" Style="{StaticResource SectionHeader}" />
+                <TimePicker Time="{Binding Time}" />
+
+                <Label Text="Category" Style="{StaticResource SectionHeader}" />
+                <Picker Title="Select Category"
+                        ItemsSource="{Binding Categories}"
+                        ItemDisplayBinding="{Binding Name}"
+                        SelectedItem="{Binding SelectedCategory}" />
+
+                <Frame Style="{StaticResource Card}" Padding="0" CornerRadius="10">
+                    <Entry Placeholder="Capacity (leave blank for unlimited)"
+                           Text="{Binding CapacityText}"
+                           Keyboard="Numeric"
+                           Style="{StaticResource InputField}" />
+                </Frame>
+
+                <!-- Image (optional) -->
+                <Image Source="{Binding ImageBase64, Converter={StaticResource ImageConverter}}"
+                       Aspect="AspectFill"
+                       HeightRequest="180"
+                       IsVisible="{Binding ImageBase64, Converter={StaticResource HasImageConverter}}" />
+
+                <HorizontalStackLayout Spacing="10">
+                    <Button Text="{Binding PickImageButtonText}"
+                            Style="{StaticResource PrimaryButton}"
+                            Command="{Binding BindingContext.PickImageCommand, Source={x:Reference RootPage}}" />
+
+                    <Button Text="Remove Image"
+                            Style="{StaticResource PrimaryButton}"
+                            IsVisible="{Binding ImageBase64, Converter={StaticResource HasImageConverter}}"
+                            Command="{Binding BindingContext.RemoveImageCommand, Source={x:Reference RootPage}}" />
+                </HorizontalStackLayout>
+
+                <Button Text="Create Event"
+                        Style="{StaticResource PrimaryButton}"
+                        Command="{Binding BindingContext.CreateCommand, Source={x:Reference RootPage}}" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+</ContentPage>

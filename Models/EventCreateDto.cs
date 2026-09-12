@@ -1,4 +1,4 @@
-﻿namespace CampusPulse.DTOs;
+namespace CampusPulse.Models;
 
 public class EventCreateDto
 {
@@ -6,6 +6,7 @@ public class EventCreateDto
     public string Description { get; set; }
     public DateTime Date { get; set; }
     public string Location { get; set; }
+    public string? ImageBase64 { get; set; }
     public int CategoryId { get; set; }
-    public int Capacity { get; set; }
+    public int? Capacity { get; set; }
 }

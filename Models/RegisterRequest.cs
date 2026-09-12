@@ -1,4 +1,4 @@
-﻿namespace CampusPulse.DTOs;
+﻿namespace CampusPulse.Models;
 
 public class RegisterRequest
 {

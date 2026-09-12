@@ -1,26 +1,24 @@
 ﻿using CampusPulse.Models;
+using CampusPulse.Services;
 
 namespace CampusPulse.Services;
 
 public class AuthenticationService
 {
-    public async Task<User?> LoginAsync(string email, string password)
+    private readonly ApiClient _api;
+
+    public AuthenticationService(ApiClient api)
     {
-        await Task.Delay(300);
+        _api = api;
+    }
 
-        if (email == "student@campuspulse.nz" &&
-            password == "Password123")
-        {
-            return new User
-            {
-                UserId = 1,
-                DisplayName = "Demo Student",
-                Email = "student@campuspulse.nz",
-                Role = "Student",
-                IsActive = true
-            };
-        }
+    public async Task<AuthResponseDto?> LoginAsync(LoginRequest dto)
+    {
+        return await _api.PostAsync<AuthResponseDto>("api/auth/login", dto);
+    }
 
-        return null;
+    public async Task<AuthResponseDto?> RegisterAsync(RegisterRequest dto)
+    {
+        return await _api.PostAsync<AuthResponseDto>("api/auth/register", dto);
     }
 }

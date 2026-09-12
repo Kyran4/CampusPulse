@@ -4,99 +4,40 @@
     x:Class="CampusPulse.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:CampusPulse"
-    xmlns:views="clr-namespace:CampusPulse.Views"
-    Title="CampusPulse"
-    FlyoutBehavior="Flyout">
+    xmlns:views="clr-namespace:CampusPulse.Views">
 
-    <FlyoutItem
-        Title="Home"
-        Route="Home">
-
-        <ShellContent
-            Title="Home"
-            ContentTemplate="{DataTemplate local:MainPage}" />
-
+    <!-- Flyout Menu -->
+    <FlyoutItem Title="Feed" Icon="feed.png" Route="FeedPage">
+        <ShellContent Route="FeedPage" ContentTemplate="{DataTemplate views:FeedPage}" />
     </FlyoutItem>
 
-    <FlyoutItem
-        Title="Feed"
-        Route="Feed">
-
-        <ShellContent
-            Title="Feed"
-            ContentTemplate="{DataTemplate views:FeedPage}" />
-
+    <FlyoutItem Title="Events" Icon="events.png" Route="EventsPage">
+        <ShellContent Route="EventsPage" ContentTemplate="{DataTemplate views:EventsPage}" />
     </FlyoutItem>
 
-    <FlyoutItem
-        Title="Interests"
-        Route="Interests">
-
-        <ShellContent
-            Title="Interests"
-            ContentTemplate="{DataTemplate views:InterestsPage}" />
-
+    <FlyoutItem Title="My Posts" Icon="posts.png" Route="MyPostsPage">
+        <ShellContent Route="MyPostsPage" ContentTemplate="{DataTemplate views:MyPostsPage}" />
     </FlyoutItem>
 
-    <FlyoutItem
-        Title="Events"
-        Route="Events">
-
-        <ShellContent
-            Title="Events"
-            ContentTemplate="{DataTemplate views:EventsPage}" />
-
+    <FlyoutItem Title="Profile" Icon="profile.png" Route="ProfilePage">
+        <ShellContent Route="ProfilePage" ContentTemplate="{DataTemplate views:ProfilePage}" />
     </FlyoutItem>
 
-    <FlyoutItem
-        Title="Create Post"
-        Route="CreatePost">
-
-        <ShellContent
-            Title="Create Post"
-            ContentTemplate="{DataTemplate views:CreatePostPage}" />
-
+    <FlyoutItem Title="My Interests" Route="InterestsPage">
+        <ShellContent Route="InterestsPage" ContentTemplate="{DataTemplate views:InterestsPage}" />
     </FlyoutItem>
 
-    <FlyoutItem
-        Title="My Posts"
-        Route="MyPosts">
-
-        <ShellContent
-            Title="My Posts"
-            ContentTemplate="{DataTemplate views:MyPostsPage}" />
-
-    </FlyoutItem>
-
-    <FlyoutItem
-        Title="Profile"
-        Route="Profile">
-
-        <ShellContent
-            Title="Profile"
-            ContentTemplate="{DataTemplate views:ProfilePage}" />
-
-    </FlyoutItem>
-
-    <FlyoutItem
-        Title="Reports"
-        Route="Reports">
-
-        <ShellContent
-            Title="Reports"
-            ContentTemplate="{DataTemplate views:ReportsPage}" />
-
-    </FlyoutItem>
-
-    <FlyoutItem
-        Title="About"
-        Route="About">
-
-        <ShellContent
-            Title="About"
-            ContentTemplate="{DataTemplate views:AboutPage}" />
-
-    </FlyoutItem>
+    <!-- Standalone Routes - FlyoutItemIsVisible="False" keeps these out of
+         the flyout menu entirely. Without it, Shell auto-wraps every
+         top-level ShellContent into its own visible, tappable flyout entry -
+         which is why Login/Register (and these others) were showing up and
+         staying clickable regardless of the runtime show/hide logic in
+         AppShell.xaml.cs. These pages are only ever reached via GoToAsync. -->
+    <ShellContent Route="CreatePostPage" Shell.FlyoutItemIsVisible="False" ContentTemplate="{DataTemplate views:CreatePostPage}" />
+    <ShellContent Route="EventDetailsPage" Shell.FlyoutItemIsVisible="False" ContentTemplate="{DataTemplate views:EventDetailsPage}" />
+    <ShellContent Route="PostDetailsPage" Shell.FlyoutItemIsVisible="False" ContentTemplate="{DataTemplate views:PostDetailsPage}" />
+    <ShellContent Route="RegisterPage" Shell.FlyoutItemIsVisible="False" ContentTemplate="{DataTemplate views:RegisterPage}" />
+    <ShellContent Route="LoginPage" Shell.FlyoutItemIsVisible="False" ContentTemplate="{DataTemplate views:LoginPage}" />
+    <ShellContent Route="CreateEventPage" Shell.FlyoutItemIsVisible="False" ContentTemplate="{DataTemplate views:CreateEventPage}" />
 
 </Shell>

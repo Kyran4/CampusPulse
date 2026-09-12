@@ -1,91 +1,71 @@
-﻿using CampusPulse.Helpers;
+using CampusPulse.Helpers;
+using CampusPulse.Models;
 using CampusPulse.Services;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using MvvmHelpers;
 using System.Windows.Input;
 
 namespace CampusPulse.ViewModels;
 
-public class LoginViewModel : INotifyPropertyChanged
+public class LoginViewModel : BaseViewModel
 {
-    private readonly AuthenticationService _authenticationService;
+    private readonly AuthenticationService _auth;
+    private readonly DatabaseService _db;
+    private readonly NavigationService _nav;
+    private readonly DialogService _dialog;
 
-    private string _email = string.Empty;
-    private string _password = string.Empty;
-
-    public string Email
+    public LoginViewModel(AuthenticationService auth, DatabaseService db, NavigationService nav, DialogService dialog)
     {
-        get => _email;
-        set
-        {
-            _email = value;
-            OnPropertyChanged();
-        }
+        _auth = auth;
+        _db = db;
+        _nav = nav;
+        _dialog = dialog;
+
+        LoginCommand = new Command(async () => await LoginAsync());
+        GoToRegisterCommand = new Command(async () => await _nav.GoToAsync("RegisterPage"));
     }
 
-    public string Password
-    {
-        get => _password;
-        set
-        {
-            _password = value;
-            OnPropertyChanged();
-        }
-    }
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 
     public ICommand LoginCommand { get; }
-
-    public LoginViewModel()
-    {
-        _authenticationService = new AuthenticationService();
-
-        LoginCommand = new Command(
-            async () => await LoginAsync());
-    }
+    public ICommand GoToRegisterCommand { get; }
 
     private async Task LoginAsync()
     {
-        if (string.IsNullOrWhiteSpace(Email) ||
-            string.IsNullOrWhiteSpace(Password))
+        if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
         {
-            await Shell.Current.DisplayAlert(
-                "Login",
-                "Please enter your email and password.",
-                "OK");
-
+            await _dialog.ShowAlert("Error", "Please enter both email and password.");
             return;
         }
 
-        var user = await _authenticationService
-            .LoginAsync(Email, Password);
-
-        if (user == null)
+        var result = await _auth.LoginAsync(new LoginRequest
         {
-            await Shell.Current.DisplayAlert(
-                "Login Failed",
-                "Email or password is incorrect.",
-                "OK");
+            Email = Email,
+            Password = Password
+        });
 
+        if (result == null)
+        {
+            await _dialog.ShowAlert("Login Failed", "Invalid email or password.");
             return;
         }
 
-        SessionManager.CurrentUser = user;
+        await _db.SaveUserAsync(result.User);
+        await _db.SaveTokenAsync(result.Token);
+        SessionManager.CurrentUser = result.User;
 
-        await Shell.Current.DisplayAlert(
-            "Login",
-            $"Welcome {user.DisplayName}",
-            "OK");
+        var shell = Shell.Current as AppShell;
 
-        await Shell.Current.GoToAsync("//Home");
-    }
+        shell?.RemoveAuthFlyout();
+        shell?.RemoveCreatePostFlyout();
+        shell?.RemoveAdminPages();
 
-    public event PropertyChangedEventHandler? PropertyChanged;
+        if (!string.IsNullOrWhiteSpace(result.Token))
+            shell?.AddCreatePostFlyout();
 
-    protected void OnPropertyChanged(
-        [CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(
-            this,
-            new PropertyChangedEventArgs(propertyName));
+        if (SessionManager.IsAdmin)
+            shell?.AddAdminPages();
+
+        await _nav.GoToAsync("//FeedPage");
     }
 }

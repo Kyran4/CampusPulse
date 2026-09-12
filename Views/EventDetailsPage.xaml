@@ -1,12 +1,86 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="CampusPulse.Views.EventDetailsPage"
-             Title="EventDetailsPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+<ContentPage
+    x:Class="CampusPulse.Views.EventDetailsPage"
+    x:Name="RootPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="{StaticResource LightGray}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- HEADER -->
+        <Grid BackgroundColor="{StaticResource PrimaryColor}" Padding="20">
+            <Label Text="Event Details" Style="{StaticResource TitleLabel}" />
+        </Grid>
+
+        <!-- CONTENT -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="20" Spacing="20">
+
+                <!-- Event Card -->
+                <Frame Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="10">
+
+                        <Image Source="{Binding Event.ImageBase64, Converter={StaticResource ImageConverter}}"
+                               Aspect="AspectFill"
+                               HeightRequest="220"
+                               IsVisible="{Binding Event.ImageBase64, Converter={StaticResource HasImageConverter}}" />
+
+                        <Label Text="{Binding Event.Title}"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource SecondaryColor}" />
+
+                        <Label Text="{Binding Event.Description}"
+                               Style="{StaticResource BodyLabel}" />
+
+                        <Label Text="{Binding Event.Location}"
+                               Style="{StaticResource BodyLabel}" />
+
+                        <Label Text="{Binding Event.Date}"
+                               Style="{StaticResource BodyLabel}" />
+
+                        <Label Text="Cancelled"
+                               TextColor="Red"
+                               FontAttributes="Bold"
+                               IsVisible="{Binding Event.IsCancelled}" />
+
+                        <Label Text="This event is full."
+                               TextColor="Red"
+                               IsVisible="{Binding IsFull}" />
+
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Join / Leave Buttons - disabled rather than left to fail
+                     server-side once cancelled, full, or in the past. -->
+                <HorizontalStackLayout Spacing="10">
+                    <Button Text="Join Event"
+                            Style="{StaticResource PrimaryButton}"
+                            IsEnabled="{Binding CanJoin}"
+                            Command="{Binding BindingContext.JoinCommand, Source={x:Reference RootPage}}" />
+
+                    <Button Text="Leave Event"
+                            Style="{StaticResource PrimaryButton}"
+                            Command="{Binding BindingContext.LeaveCommand, Source={x:Reference RootPage}}" />
+                </HorizontalStackLayout>
+
+                <!-- Attendees -->
+                <Label Text="Attendees" Style="{StaticResource SectionHeader}" />
+
+                <CollectionView ItemsSource="{Binding Attendees}" SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame Style="{StaticResource Card}">
+                                <Label Text="{Binding DisplayName}"
+                                       Style="{StaticResource BodyLabel}" />
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
 </ContentPage>

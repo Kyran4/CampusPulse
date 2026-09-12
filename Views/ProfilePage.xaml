@@ -1,12 +1,66 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="CampusPulse.Views.ProfilePage"
-             Title="ProfilePage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+<ContentPage
+    x:Class="CampusPulse.Views.ProfilePage"
+    x:Name="RootPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="{StaticResource LightGray}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- HEADER -->
+        <Grid BackgroundColor="{StaticResource PrimaryColor}" Padding="20">
+            <Label Text="My Profile" Style="{StaticResource TitleLabel}" />
+        </Grid>
+
+        <!-- CONTENT -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="20" Spacing="16">
+
+                <Frame Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="14">
+
+                        <Image Source="{Binding ProfileImageUrl, Converter={StaticResource ImageConverter}}"
+                               Aspect="AspectFill"
+                               HeightRequest="120"
+                               WidthRequest="120"
+                               HorizontalOptions="Center"
+                               IsVisible="{Binding ProfileImageUrl, Converter={StaticResource HasImageConverter}}" />
+
+                        <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+                            <Button Text="Change Photo"
+                                    Style="{StaticResource PrimaryButton}"
+                                    Command="{Binding BindingContext.PickImageCommand, Source={x:Reference RootPage}}" />
+
+                            <Button Text="Remove Photo"
+                                    Style="{StaticResource PrimaryButton}"
+                                    IsVisible="{Binding ProfileImageUrl, Converter={StaticResource HasImageConverter}}"
+                                    Command="{Binding BindingContext.RemoveImageCommand, Source={x:Reference RootPage}}" />
+                        </HorizontalStackLayout>
+
+                        <Label Text="Display Name" Style="{StaticResource BodyLabel}" />
+                        <Entry Text="{Binding DisplayName}" Style="{StaticResource InputField}" />
+
+                        <Label Text="Email" Style="{StaticResource BodyLabel}" />
+                        <Entry Text="{Binding Email}" Keyboard="Email" Style="{StaticResource InputField}" />
+
+                        <Label Text="{Binding Role}"
+                               FontAttributes="Italic"
+                               Style="{StaticResource BodyLabel}" />
+
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Button Text="Save Changes"
+                        Style="{StaticResource PrimaryButton}"
+                        Command="{Binding SaveCommand}" />
+
+                <Button Text="Logout"
+                        Style="{StaticResource PrimaryButton}"
+                        Command="{Binding LogoutCommand}" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
 </ContentPage>

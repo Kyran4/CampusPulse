@@ -1,12 +1,116 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="CampusPulse.Views.PostDetailsPage"
-             Title="PostDetailsPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+<ContentPage
+    x:Class="CampusPulse.Views.PostDetailsPage"
+    x:Name="RootPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="{StaticResource LightGray}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- HEADER -->
+        <Grid BackgroundColor="{StaticResource PrimaryColor}" Padding="20">
+            <Label Text="Post Details" Style="{StaticResource TitleLabel}" />
+        </Grid>
+
+        <!-- CONTENT -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="20" Spacing="20">
+
+                <!-- Post Card -->
+                <Frame Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="10">
+
+                        <Image Source="{Binding Post.ImageBase64, Converter={StaticResource ImageConverter}}"
+                               Aspect="AspectFill"
+                               HeightRequest="220"
+                               IsVisible="{Binding Post.ImageBase64, Converter={StaticResource HasImageConverter}}" />
+
+                        <Label Text="{Binding Post.Title}"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource SecondaryColor}" />
+
+                        <Label Text="{Binding Post.Content}"
+                               Style="{StaticResource BodyLabel}" />
+
+                        <!-- Only the post's owner (or an Admin) sees these -
+                             the API re-checks ownership regardless, this
+                             just avoids showing a button that would fail. -->
+                        <HorizontalStackLayout Spacing="10"
+                                                IsVisible="{Binding CanManagePost}">
+                            <Button Text="Edit"
+                                    Style="{StaticResource PrimaryButton}"
+                                    Command="{Binding BindingContext.EditPostCommand, Source={x:Reference RootPage}}" />
+
+                            <Button Text="Delete"
+                                    Style="{StaticResource PrimaryButton}"
+                                    Command="{Binding BindingContext.DeletePostCommand, Source={x:Reference RootPage}}" />
+                        </HorizontalStackLayout>
+
+                        <Button Text="Report Post"
+                                Style="{StaticResource PrimaryButton}"
+                                Command="{Binding BindingContext.ReportPostCommand, Source={x:Reference RootPage}}" />
+
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Reaction Buttons - US-13: Like / Helpful / Interested -->
+                <Label Text="{Binding ReactionSummary}" Style="{StaticResource BodyLabel}" />
+                <HorizontalStackLayout Spacing="10">
+                    <Button Text="👍 Like"
+                            Style="{StaticResource PrimaryButton}"
+                            Command="{Binding BindingContext.AddReactionCommand, Source={x:Reference RootPage}}"
+                            CommandParameter="Like" />
+
+                    <Button Text="🙌 Helpful"
+                            Style="{StaticResource PrimaryButton}"
+                            Command="{Binding BindingContext.AddReactionCommand, Source={x:Reference RootPage}}"
+                            CommandParameter="Helpful" />
+
+                    <Button Text="👀 Interested"
+                            Style="{StaticResource PrimaryButton}"
+                            Command="{Binding BindingContext.AddReactionCommand, Source={x:Reference RootPage}}"
+                            CommandParameter="Interested" />
+                </HorizontalStackLayout>
+
+                <!-- Comments Header -->
+                <Label Text="Comments" Style="{StaticResource SectionHeader}" />
+
+                <!-- Comments List -->
+                <CollectionView ItemsSource="{Binding Comments}" SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame Style="{StaticResource Card}">
+                                <VerticalStackLayout Spacing="6">
+                                    <Label Text="{Binding Content}"
+                                           Style="{StaticResource BodyLabel}" />
+
+                                    <Button Text="Delete"
+                                            Style="{StaticResource PrimaryButton}"
+                                            HorizontalOptions="End"
+                                            IsVisible="{Binding CanManage}"
+                                            Command="{Binding BindingContext.DeleteCommentCommand, Source={x:Reference RootPage}}"
+                                            CommandParameter="{Binding .}" />
+                                </VerticalStackLayout>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- Add Comment -->
+                <Frame Style="{StaticResource Card}" Padding="0" CornerRadius="10">
+                    <Entry Placeholder="Write a comment..."
+                           Text="{Binding NewComment}"
+                           Style="{StaticResource InputField}" />
+                </Frame>
+
+                <Button Text="Post Comment"
+                        Style="{StaticResource PrimaryButton}"
+                        Command="{Binding BindingContext.AddCommentCommand, Source={x:Reference RootPage}}" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
 </ContentPage>
