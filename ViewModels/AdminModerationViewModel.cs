@@ -50,7 +50,7 @@ public class AdminModerationViewModel : BaseViewModel
         }
         else
         {
-            await _dialog.ShowAlert("Error", "Couldn't load reports. Make sure you're logged in as an Admin and the API is reachable.");
+            await _dialog.ShowAlert("Error", "Couldn't load reports." + (string.IsNullOrWhiteSpace(_reports.LastError) ? "" : $"\n\n({_reports.LastError})"));
         }
 
         IsBusy = false;

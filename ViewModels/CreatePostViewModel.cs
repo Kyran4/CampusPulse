@@ -1,3 +1,4 @@
+using CampusPulse.Helpers;
 using CampusPulse.Models;
 using CampusPulse.Services;
 using MvvmHelpers;
@@ -28,6 +29,13 @@ public class CreatePostViewModel : BaseViewModel
         _dialog = dialog;
 
         CreateCommand = new Command(async () => await SaveAsync());
+        PickImageCommand = new Command(async () => await PickImageAsync());
+        RemoveImageCommand = new Command(() =>
+        {
+            ImageBase64 = string.Empty;
+            OnPropertyChanged(nameof(ImageBase64));
+            OnPropertyChanged(nameof(PickImageButtonText));
+        });
     }
 
     // When set (via the "CreatePostPage?editPostId=..." route from
@@ -53,6 +61,8 @@ public class CreatePostViewModel : BaseViewModel
     public string Content { get; set; } = string.Empty;
     public string ImageBase64 { get; set; } = string.Empty;
 
+    public string PickImageButtonText => string.IsNullOrEmpty(ImageBase64) ? "Add Image" : "Change Image";
+
     private List<Category> _categoriesList = new();
     public List<Category> Categories
     {
@@ -63,6 +73,8 @@ public class CreatePostViewModel : BaseViewModel
     public Category SelectedCategory { get; set; }
 
     public ICommand CreateCommand { get; }
+    public ICommand PickImageCommand { get; }
+    public ICommand RemoveImageCommand { get; }
 
     public async Task LoadCategoriesAsync()
     {
@@ -88,6 +100,16 @@ public class CreatePostViewModel : BaseViewModel
 
     private int? _pendingCategoryId;
 
+    private async Task PickImageAsync()
+    {
+        var base64 = await ImagePickerHelper.PickImageAsBase64Async();
+        if (base64 == null) return; // user cancelled
+
+        ImageBase64 = base64;
+        OnPropertyChanged(nameof(ImageBase64));
+        OnPropertyChanged(nameof(PickImageButtonText));
+    }
+
     private async Task LoadPostToEditAsync(int postId)
     {
         var post = await _posts.GetPostAsync(postId);
@@ -105,6 +127,7 @@ public class CreatePostViewModel : BaseViewModel
         OnPropertyChanged(nameof(Title));
         OnPropertyChanged(nameof(Content));
         OnPropertyChanged(nameof(ImageBase64));
+        OnPropertyChanged(nameof(PickImageButtonText));
         OnPropertyChanged(nameof(IsEditing));
         OnPropertyChanged(nameof(PageTitle));
         OnPropertyChanged(nameof(SaveButtonText));

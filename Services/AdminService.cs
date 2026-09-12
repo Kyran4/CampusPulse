@@ -6,6 +6,8 @@ public class AdminService
 {
     private readonly ApiClient _api;
 
+    public string? LastError => _api.LastError;
+
     public AdminService(ApiClient api)
     {
         _api = api;

@@ -6,6 +6,8 @@ public class ReportService
 {
     private readonly ApiClient _api;
 
+    public string? LastError => _api.LastError;
+
     public ReportService(ApiClient api)
     {
         _api = api;

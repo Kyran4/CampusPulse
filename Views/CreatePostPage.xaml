@@ -38,6 +38,23 @@
                         ItemDisplayBinding="{Binding Name}"
                         SelectedItem="{Binding SelectedCategory}" />
 
+                <!-- Image (optional) -->
+                <Image Source="{Binding ImageBase64, Converter={StaticResource ImageConverter}}"
+                       Aspect="AspectFill"
+                       HeightRequest="180"
+                       IsVisible="{Binding ImageBase64, Converter={StaticResource HasImageConverter}}" />
+
+                <HorizontalStackLayout Spacing="10">
+                    <Button Text="{Binding PickImageButtonText}"
+                            Style="{StaticResource PrimaryButton}"
+                            Command="{Binding BindingContext.PickImageCommand, Source={x:Reference RootPage}}" />
+
+                    <Button Text="Remove Image"
+                            Style="{StaticResource PrimaryButton}"
+                            IsVisible="{Binding ImageBase64, Converter={StaticResource HasImageConverter}}"
+                            Command="{Binding BindingContext.RemoveImageCommand, Source={x:Reference RootPage}}" />
+                </HorizontalStackLayout>
+
                 <!-- Publish / Save Button -->
                 <Button Text="{Binding SaveButtonText}"
                         Style="{StaticResource PrimaryButton}"

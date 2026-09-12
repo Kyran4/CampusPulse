@@ -49,7 +49,7 @@ public class AdminUsersViewModel : BaseViewModel
         }
         else
         {
-            await _dialog.ShowAlert("Error", "Couldn't load users. Make sure you're logged in as an Admin and the API is reachable.");
+            await _dialog.ShowAlert("Error", "Couldn't load users." + (string.IsNullOrWhiteSpace(_admin.LastError) ? "" : $"\n\n({_admin.LastError})"));
         }
 
         IsBusy = false;

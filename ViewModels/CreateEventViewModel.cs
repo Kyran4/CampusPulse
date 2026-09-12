@@ -1,3 +1,4 @@
+using CampusPulse.Helpers;
 using CampusPulse.Models;
 using CampusPulse.Services;
 using MvvmHelpers;
@@ -22,6 +23,13 @@ public class CreateEventViewModel : BaseViewModel
         _dialog = dialog;
 
         CreateCommand = new Command(async () => await CreateAsync());
+        PickImageCommand = new Command(async () => await PickImageAsync());
+        RemoveImageCommand = new Command(() =>
+        {
+            ImageBase64 = string.Empty;
+            OnPropertyChanged(nameof(ImageBase64));
+            OnPropertyChanged(nameof(PickImageButtonText));
+        });
         Date = DateTime.Today.AddDays(7);
         Time = new TimeSpan(18, 0, 0);
     }
@@ -30,6 +38,8 @@ public class CreateEventViewModel : BaseViewModel
     public string Description { get; set; } = string.Empty;
     public string Location { get; set; } = string.Empty;
     public string ImageBase64 { get; set; } = string.Empty;
+
+    public string PickImageButtonText => string.IsNullOrEmpty(ImageBase64) ? "Add Image" : "Change Image";
 
     public DateTime Date { get; set; }
     public TimeSpan Time { get; set; }
@@ -47,6 +57,18 @@ public class CreateEventViewModel : BaseViewModel
     public Category SelectedCategory { get; set; }
 
     public ICommand CreateCommand { get; }
+    public ICommand PickImageCommand { get; }
+    public ICommand RemoveImageCommand { get; }
+
+    private async Task PickImageAsync()
+    {
+        var base64 = await ImagePickerHelper.PickImageAsBase64Async();
+        if (base64 == null) return;
+
+        ImageBase64 = base64;
+        OnPropertyChanged(nameof(ImageBase64));
+        OnPropertyChanged(nameof(PickImageButtonText));
+    }
 
     public async Task LoadCategoriesAsync()
     {

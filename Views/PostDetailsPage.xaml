@@ -21,6 +21,11 @@
                 <Frame Style="{StaticResource Card}">
                     <VerticalStackLayout Spacing="10">
 
+                        <Image Source="{Binding Post.ImageBase64, Converter={StaticResource ImageConverter}}"
+                               Aspect="AspectFill"
+                               HeightRequest="220"
+                               IsVisible="{Binding Post.ImageBase64, Converter={StaticResource HasImageConverter}}" />
+
                         <Label Text="{Binding Post.Title}"
                                FontSize="22"
                                FontAttributes="Bold"

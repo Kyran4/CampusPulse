@@ -182,4 +182,61 @@ public partial class AppShell : Shell
         if (item != null)
             Items.Remove(item);
     }
+
+    public void AddAuthFlyout()
+    {
+        // Prevent duplicates
+        if (Items.Any(i =>
+            i.Route == "LoginPage" ||
+            i.Route == "RegisterPage"))
+        {
+            return;
+        }
+
+        var login = new FlyoutItem
+        {
+            Title = "Login",
+            Icon = "login.png",
+            Route = "LoginPage",
+            Items =
+            {
+                new ShellContent
+                {
+                    Route = "LoginPage",
+                    ContentTemplate = new DataTemplate(typeof(LoginPage))
+                }
+            }
+        };
+
+        var register = new FlyoutItem
+        {
+            Title = "Register",
+            Icon = "register.png",
+            Route = "RegisterPage",
+            Items =
+            {
+                new ShellContent
+                {
+                    Route = "RegisterPage",
+                    ContentTemplate = new DataTemplate(typeof(RegisterPage))
+                }
+            }
+        };
+
+        Items.Add(login);
+        Items.Add(register);
+    }
+
+    public void RemoveAuthFlyout()
+    {
+        // Remove authentication-related flyout items (e.g., Login/Register links in unauthenticated state)
+        var authItems = Items
+            .Where(i =>
+                i.Route == "LoginPage" ||
+                i.Route == "RegisterPage")
+            .ToList();
+
+        foreach (var item in authItems)
+            Items.Remove(item);
+    }
 }

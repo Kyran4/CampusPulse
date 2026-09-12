@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="CampusPulse.Views.InterestsPage"
+    x:Name="RootPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="{StaticResource LightGray}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <Grid BackgroundColor="{StaticResource PrimaryColor}" Padding="20">
+            <Label Text="My Interests" Style="{StaticResource TitleLabel}" />
+        </Grid>
+
+        <CollectionView
+            Grid.Row="1"
+            ItemsSource="{Binding Interests}"
+            SelectionMode="None"
+            Margin="20">
+
+            <CollectionView.EmptyView>
+                <Label Text="No interests/categories exist yet."
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       TextColor="{StaticResource SecondaryColor}" />
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Style="{StaticResource Card}">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0"
+                                   Text="{Binding Name}"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Center"
+                                   TextColor="{StaticResource SecondaryColor}" />
+
+                            <Button Grid.Column="1"
+                                    Text="Following"
+                                    Style="{StaticResource PrimaryButton}"
+                                    IsVisible="{Binding IsFollowed}"
+                                    Command="{Binding BindingContext.UnfollowCommand, Source={x:Reference RootPage}}"
+                                    CommandParameter="{Binding .}" />
+
+                            <Button Grid.Column="1"
+                                    Text="Follow"
+                                    Style="{StaticResource PrimaryButton}"
+                                    IsVisible="{Binding IsFollowed, Converter={StaticResource InvertedBoolConverter}}"
+                                    Command="{Binding BindingContext.FollowCommand, Source={x:Reference RootPage}}"
+                                    CommandParameter="{Binding .}" />
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+    </Grid>
+</ContentPage>

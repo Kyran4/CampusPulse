@@ -8,6 +8,8 @@
     <Application.Resources>
 
         <helpers:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        <helpers:Base64OrUrlImageConverter x:Key="ImageConverter" />
+        <helpers:StringHasValueConverter x:Key="HasImageConverter" />
 
         <!-- ========================= -->
         <!--        COLOR PALETTE      -->

@@ -6,7 +6,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     BackgroundColor="{StaticResource LightGray}">
 
-    <Grid RowDefinitions="Auto,Auto,Auto,*">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
 
         <!-- Header -->
         <Grid BackgroundColor="{StaticResource PrimaryColor}" Padding="20">
@@ -18,11 +18,26 @@
             <Picker Title="All Categories"
                     ItemsSource="{Binding Categories}"
                     ItemDisplayBinding="{Binding Name}"
-                    SelectedItem="{Binding SelectedCategory}" />
+                    SelectedItem="{Binding SelectedCategory}"
+                    IsEnabled="{Binding ShowFollowingOnly, Converter={StaticResource InvertedBoolConverter}}" />
+        </Grid>
+
+        <!-- Following filter - change request: view content relevant to
+             followed interests, right in the campus feed. -->
+        <Grid Padding="20,0" Grid.Row="2" ColumnDefinitions="*,Auto">
+            <HorizontalStackLayout Grid.Column="0" Spacing="10" VerticalOptions="Center">
+                <Switch IsToggled="{Binding ShowFollowingOnly}" />
+                <Label Text="Following only" VerticalOptions="Center" Style="{StaticResource BodyLabel}" />
+            </HorizontalStackLayout>
+
+            <Button Grid.Column="1"
+                    Text="My Interests"
+                    Style="{StaticResource PrimaryButton}"
+                    Command="{Binding ManageInterestsCommand}" />
         </Grid>
 
         <!-- Create Post Button -->
-        <Grid Padding="20,0,20,10" Grid.Row="2">
+        <Grid Padding="20,10,20,10" Grid.Row="3">
             <Button
                 Text="Create Post"
                 Style="{StaticResource PrimaryButton}"
@@ -31,13 +46,13 @@
 
         <!-- Feed -->
         <CollectionView
-            Grid.Row="3"
+            Grid.Row="4"
             ItemsSource="{Binding Posts}"
             SelectionMode="None"
             Margin="20">
 
             <CollectionView.EmptyView>
-                <Label Text="No posts yet. Be the first to create one!"
+                <Label Text="No posts here yet."
                        HorizontalOptions="Center"
                        VerticalOptions="Center"
                        TextColor="{StaticResource SecondaryColor}" />
@@ -47,6 +62,11 @@
                 <DataTemplate>
                     <Frame Style="{StaticResource Card}">
                         <VerticalStackLayout Spacing="10">
+
+                            <Image Source="{Binding ImageBase64, Converter={StaticResource ImageConverter}}"
+                                   Aspect="AspectFill"
+                                   HeightRequest="160"
+                                   IsVisible="{Binding ImageBase64, Converter={StaticResource HasImageConverter}}" />
 
                             <Label Text="{Binding Title}"
                                    FontSize="20"

@@ -1,4 +1,4 @@
-﻿using CampusPulse.Models;
+using CampusPulse.Models;
 
 namespace CampusPulse.Services;
 
@@ -11,8 +11,15 @@ public class UserService
         _api = api;
     }
 
-    public async Task<User?> GetUserAsync(int id)
+    public string? LastError => _api.LastError;
+
+    public async Task<User?> GetMeAsync()
     {
-        return await _api.GetAsync<User>($"users/{id}");
+        return await _api.GetAsync<User>("api/users/me");
+    }
+
+    public async Task<User?> UpdateProfileAsync(UpdateProfileDto dto)
+    {
+        return await _api.PutAsync<User>("api/users/me", dto);
     }
 }

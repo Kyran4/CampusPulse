@@ -10,13 +10,15 @@ public class FeedViewModel : BaseViewModel
 {
     private readonly PostService _posts;
     private readonly CategoryService _categories;
+    private readonly FollowService _follows;
     private readonly NavigationService _nav;
     private readonly DialogService _dialog;
 
-    public FeedViewModel(PostService posts, CategoryService categories, NavigationService nav, DialogService dialog)
+    public FeedViewModel(PostService posts, CategoryService categories, FollowService follows, NavigationService nav, DialogService dialog)
     {
         _posts = posts;
         _categories = categories;
+        _follows = follows;
         _nav = nav;
         _dialog = dialog;
 
@@ -26,6 +28,7 @@ public class FeedViewModel : BaseViewModel
         RefreshCommand = new Command(async () => await LoadFeedAsync());
         CreatePostCommand = new Command(async () => await _nav.GoToAsync("CreatePostPage"));
         OpenPostCommand = new Command<Post>(async (post) => await OpenPostAsync(post));
+        ManageInterestsCommand = new Command(async () => await _nav.GoToAsync("//InterestsPage"));
 
         _ = InitAsync();
     }
@@ -54,9 +57,25 @@ public class FeedViewModel : BaseViewModel
         }
     }
 
+    // Change request: "a filter showing posts from followed categories" -
+    // this and the category picker are mutually exclusive filters on the
+    // same feed rather than two separate screens. Turning this on ignores
+    // SelectedCategory; turning it off goes back to the normal/category feed.
+    private bool _showFollowingOnly;
+    public bool ShowFollowingOnly
+    {
+        get => _showFollowingOnly;
+        set
+        {
+            if (SetProperty(ref _showFollowingOnly, value))
+                _ = LoadFeedAsync();
+        }
+    }
+
     public ICommand RefreshCommand { get; }
     public ICommand CreatePostCommand { get; }
     public ICommand OpenPostCommand { get; }
+    public ICommand ManageInterestsCommand { get; }
 
     private async Task LoadCategoriesAsync()
     {
@@ -80,11 +99,26 @@ public class FeedViewModel : BaseViewModel
     {
         IsBusy = true;
 
-        var categoryId = SelectedCategory != null && SelectedCategory.CategoryId != 0
-            ? SelectedCategory.CategoryId
-            : (int?)null;
+        List<Post>? feed;
 
-        var feed = await _posts.GetFeedAsync(categoryId);
+        if (ShowFollowingOnly)
+        {
+            feed = await _follows.GetFollowingFeedAsync();
+
+            if (feed == null)
+            {
+                await _dialog.ShowAlert("Error", "Couldn't load your followed feed." + (string.IsNullOrWhiteSpace(_follows.LastError) ? "" : $"\n\n({_follows.LastError})"));
+            }
+        }
+        else
+        {
+            var categoryId = SelectedCategory != null && SelectedCategory.CategoryId != 0
+                ? SelectedCategory.CategoryId
+                : (int?)null;
+
+            feed = await _posts.GetFeedAsync(categoryId);
+        }
+
         Posts.Clear();
 
         if (feed != null)

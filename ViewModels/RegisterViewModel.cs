@@ -72,6 +72,7 @@ public class RegisterViewModel : BaseViewModel
 
         var shell = Shell.Current as AppShell;
 
+        shell?.RemoveAuthFlyout();
         shell?.RemoveCreatePostFlyout();
         shell?.RemoveAdminPages(); // new accounts are always Student
 

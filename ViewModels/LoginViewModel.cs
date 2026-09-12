@@ -56,6 +56,7 @@ public class LoginViewModel : BaseViewModel
 
         var shell = Shell.Current as AppShell;
 
+        shell?.RemoveAuthFlyout();
         shell?.RemoveCreatePostFlyout();
         shell?.RemoveAdminPages();
 

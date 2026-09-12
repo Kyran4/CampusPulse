@@ -60,7 +60,7 @@ public class AdminDashboardViewModel : BaseViewModel
             // Distinguishing this from "genuinely zero" - if you see this,
             // it's a permissions/connection problem (this endpoint requires
             // a valid Admin token), not an empty database.
-            await _dialog.ShowAlert("Error", "Couldn't load dashboard stats. Make sure you're logged in as an Admin and the API is reachable.");
+            await _dialog.ShowAlert("Error", "Couldn't load dashboard stats." + (string.IsNullOrWhiteSpace(_admin.LastError) ? "" : $"\n\n({_admin.LastError})"));
         }
 
         var feed = await _posts.GetFeedAsync();

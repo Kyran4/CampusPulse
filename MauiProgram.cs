@@ -47,11 +47,14 @@ public static class MauiProgram
         // ============================
         builder.Services.AddSingleton<AuthenticationService>();
         builder.Services.AddSingleton<PostService>();
+        builder.Services.AddSingleton<CommentService>();
+        builder.Services.AddSingleton<ReactionService>();
         builder.Services.AddSingleton<EventService>();
         builder.Services.AddSingleton<ReportService>();
         builder.Services.AddSingleton<UserService>();
         builder.Services.AddSingleton<CategoryService>();
         builder.Services.AddSingleton<AdminService>();
+        builder.Services.AddSingleton<FollowService>();
 
 
         // ============================
@@ -101,6 +104,10 @@ public static class MauiProgram
         // Admin Users
         builder.Services.AddTransient<AdminUsersViewModel>();
         builder.Services.AddTransient<AdminUsersPage>();
+
+        // Interests (follow/unfollow categories)
+        builder.Services.AddTransient<InterestsViewModel>();
+        builder.Services.AddTransient<InterestsPage>();
 
         // Profile
         builder.Services.AddTransient<ProfileViewModel>();

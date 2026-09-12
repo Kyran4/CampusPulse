@@ -22,6 +22,10 @@
         <ShellContent Route="ProfilePage" ContentTemplate="{DataTemplate views:ProfilePage}" />
     </FlyoutItem>
 
+    <FlyoutItem Title="My Interests" Route="InterestsPage">
+        <ShellContent Route="InterestsPage" ContentTemplate="{DataTemplate views:InterestsPage}" />
+    </FlyoutItem>
+
     <!-- Standalone Routes - FlyoutItemIsVisible="False" keeps these out of
          the flyout menu entirely. Without it, Shell auto-wraps every
          top-level ShellContent into its own visible, tappable flyout entry -
