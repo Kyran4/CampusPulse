@@ -1,4 +1,5 @@
-﻿using CampusPulse.Services;
+﻿using CampusPulse.Helpers;
+using CampusPulse.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -9,8 +10,6 @@ namespace CampusPulse.ViewModels;
 public class InterestsViewModel : INotifyPropertyChanged
 {
     private readonly CategoryService _categoryService;
-
-    private const int UserId = 1;
 
     public ObservableCollection<InterestItemViewModel> Interests { get; set; }
 
@@ -34,16 +33,34 @@ public class InterestsViewModel : INotifyPropertyChanged
     {
         try
         {
+            var user = SessionManager.CurrentUser;
+
+            if (user == null)
+            {
+                await Shell.Current.DisplayAlert(
+                    "Login Required",
+                    "Please log in to view your interests.",
+                    "OK");
+
+                return;
+            }
+
+            int userId = user.UserId;
+
             Interests.Clear();
             FollowedInterests.Clear();
 
-            var interests = await _categoryService.GetInterestsAsync();
-            var followed = await _categoryService.GetFollowedInterestsAsync(UserId);
+            var interests =
+                await _categoryService.GetInterestsAsync();
+
+            var followed =
+                await _categoryService.GetFollowedInterestsAsync(userId);
 
             foreach (var category in interests)
             {
                 var isFollowing =
-                    followed.Any(f => f.CategoryId == category.CategoryId);
+                    followed.Any(f =>
+                        f.CategoryId == category.CategoryId);
 
                 var item = new InterestItemViewModel
                 {
@@ -71,17 +88,34 @@ public class InterestsViewModel : INotifyPropertyChanged
         }
     }
 
-    private async Task ToggleFollowAsync(InterestItemViewModel interest)
+    private async Task ToggleFollowAsync(
+        InterestItemViewModel interest)
     {
         if (interest == null)
             return;
+
+        var user = SessionManager.CurrentUser;
+
+        if (user == null)
+        {
+            await Shell.Current.DisplayAlert(
+                "Login Required",
+                "Please log in to follow interests.",
+                "OK");
+
+            return;
+        }
+
+        int userId = user.UserId;
 
         bool success;
 
         if (interest.IsFollowing)
         {
             success = await _categoryService
-                .UnfollowInterestAsync(interest.CategoryId, UserId);
+                .UnfollowInterestAsync(
+                    interest.CategoryId,
+                    userId);
 
             if (success)
             {
@@ -92,7 +126,9 @@ public class InterestsViewModel : INotifyPropertyChanged
         else
         {
             success = await _categoryService
-                .FollowInterestAsync(interest.CategoryId, UserId);
+                .FollowInterestAsync(
+                    interest.CategoryId,
+                    userId);
 
             if (success)
             {

@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CampusPulse.Models;
 
-namespace CampusPulse.Helpers
+namespace CampusPulse.Helpers;
+
+public static class SessionManager
 {
-    internal class SessionManager
+    public static User? CurrentUser { get; set; }
+
+    public static bool IsLoggedIn =>
+        CurrentUser != null;
+
+    public static void Logout()
     {
+        CurrentUser = null;
     }
 }
