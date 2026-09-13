@@ -8,16 +8,16 @@
 
     <Grid RowDefinitions="Auto,*">
 
-        <!-- ========================= -->
-        <!--        CUSTOM HEADER      -->
-        <!-- ========================= -->
+        
+        <!-- The Custom Header -->
+        
         <Grid BackgroundColor="{StaticResource PrimaryColor}" Padding="20">
             <Label Text="Create Account" Style="{StaticResource TitleLabel}" />
         </Grid>
 
-        <!-- ========================= -->
-        <!--        MAIN CONTENT       -->
-        <!-- ========================= -->
+        
+        <!-- The Main Content -->
+        
         <ScrollView Grid.Row="1">
             <VerticalStackLayout Padding="20" Spacing="20">
 
