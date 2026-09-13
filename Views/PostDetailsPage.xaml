@@ -50,6 +50,7 @@
 
                         <Button Text="Report Post"
                                 Style="{StaticResource PrimaryButton}"
+                                IsVisible="{Binding BindingContext.CanReport, Source={x:Reference RootPage}}"
                                 Command="{Binding BindingContext.ReportPostCommand, Source={x:Reference RootPage}}" />
 
                     </VerticalStackLayout>
@@ -79,6 +80,11 @@
 
                 <!-- Comments List -->
                 <CollectionView ItemsSource="{Binding Comments}" SelectionMode="None">
+                    <CollectionView.EmptyView>
+                        <Label Text="No comments yet - be the first to reply."
+                               HorizontalOptions="Center"
+                               Style="{StaticResource BodyLabel}" />
+                    </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Frame Style="{StaticResource Card}">

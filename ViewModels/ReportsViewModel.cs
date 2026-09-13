@@ -22,6 +22,10 @@ public class ReportsViewModel : BaseViewModel
         RefreshCommand = new Command(async () => await LoadReportsAsync());
         OpenPostCommand = new Command<int?>(async (id) => await OpenPostAsync(id));
         MarkReviewedCommand = new Command<Report>(async (r) => await ReviewAsync(r, "Reviewed"));
+        // Reverting to Pending puts it back in front of Admins as needing
+        // attention - covers "I marked that reviewed by mistake" / "actually
+        // this needs a second look."
+        UndoReviewCommand = new Command<Report>(async (r) => await ReviewAsync(r, "Pending"));
 
         _ = LoadReportsAsync();
     }
@@ -31,6 +35,7 @@ public class ReportsViewModel : BaseViewModel
     public ICommand RefreshCommand { get; }
     public ICommand OpenPostCommand { get; }
     public ICommand MarkReviewedCommand { get; }
+    public ICommand UndoReviewCommand { get; }
 
     private async Task LoadReportsAsync()
     {

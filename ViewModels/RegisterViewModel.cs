@@ -75,9 +75,13 @@ public class RegisterViewModel : BaseViewModel
         shell?.RemoveAuthFlyout();
         shell?.RemoveCreatePostFlyout();
         shell?.RemoveAdminPages(); // new accounts are always Student
+        shell?.RemoveMemberPages();
 
         if (!string.IsNullOrWhiteSpace(result.Token))
+        {
             shell?.AddCreatePostFlyout();
+            shell?.AddMemberPages();
+        }
 
         await _nav.GoToAsync("//FeedPage");
     }

@@ -9,4 +9,12 @@ public partial class AdminModerationPage : ContentPage
         InitializeComponent();
         BindingContext = vm;
     }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (BindingContext is AdminModerationViewModel vm)
+            vm.RefreshCommand.Execute(null);
+    }
 }

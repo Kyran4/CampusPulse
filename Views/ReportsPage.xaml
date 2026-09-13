@@ -18,6 +18,13 @@
             SelectionMode="None"
             Margin="20">
 
+            <CollectionView.EmptyView>
+                <Label Text="No reports have been filed."
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       TextColor="{StaticResource SecondaryColor}" />
+            </CollectionView.EmptyView>
+
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Frame Style="{StaticResource Card}">
@@ -42,10 +49,22 @@
                                     Command="{Binding BindingContext.OpenPostCommand, Source={x:Reference RootPage}}"
                                     CommandParameter="{Binding PostId}" />
 
+                                <!-- Pending reports get a "Mark Reviewed" action -->
                                 <Button
                                     Text="Mark Reviewed"
                                     Style="{StaticResource PrimaryButton}"
+                                    IsVisible="{Binding Status, Converter={StaticResource IsPendingConverter}}"
                                     Command="{Binding BindingContext.MarkReviewedCommand, Source={x:Reference RootPage}}"
+                                    CommandParameter="{Binding .}" />
+
+                                <!-- Already-reviewed reports get an Undo
+                                     action instead, to put them back in the
+                                     Pending queue. -->
+                                <Button
+                                    Text="Undo"
+                                    Style="{StaticResource PrimaryButton}"
+                                    IsVisible="{Binding Status, Converter={StaticResource IsPendingConverter}, ConverterParameter=invert}"
+                                    Command="{Binding BindingContext.UndoReviewCommand, Source={x:Reference RootPage}}"
                                     CommandParameter="{Binding .}" />
                             </HorizontalStackLayout>
 

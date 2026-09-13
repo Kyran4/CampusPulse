@@ -9,4 +9,12 @@ public partial class InterestsPage : ContentPage
         InitializeComponent();
         BindingContext = vm;
     }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (BindingContext is InterestsViewModel vm)
+            vm.RefreshCommand.Execute(null);
+    }
 }

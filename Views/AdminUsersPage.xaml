@@ -29,6 +29,13 @@
             SelectionMode="None"
             Margin="20">
 
+            <CollectionView.EmptyView>
+                <Label Text="No users found."
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       TextColor="{StaticResource SecondaryColor}" />
+            </CollectionView.EmptyView>
+
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Frame Style="{StaticResource Card}">

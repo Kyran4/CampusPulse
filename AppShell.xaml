@@ -14,7 +14,7 @@
         <ShellContent Route="EventsPage" ContentTemplate="{DataTemplate views:EventsPage}" />
     </FlyoutItem>
 
-    <FlyoutItem Title="My Posts" Icon="posts.png" Route="MyPostsPage">
+    <FlyoutItem Title="My Posts" Icon="posts.png" Route="MyPostsPage" Shell.FlyoutItemIsVisible="False">
         <ShellContent Route="MyPostsPage" ContentTemplate="{DataTemplate views:MyPostsPage}" />
     </FlyoutItem>
 
@@ -22,7 +22,7 @@
         <ShellContent Route="ProfilePage" ContentTemplate="{DataTemplate views:ProfilePage}" />
     </FlyoutItem>
 
-    <FlyoutItem Title="My Interests" Route="InterestsPage">
+    <FlyoutItem Title="My Interests" Route="InterestsPage" Shell.FlyoutItemIsVisible="False">
         <ShellContent Route="InterestsPage" ContentTemplate="{DataTemplate views:InterestsPage}" />
     </FlyoutItem>
 

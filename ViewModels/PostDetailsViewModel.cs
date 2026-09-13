@@ -90,6 +90,10 @@ public class PostDetailsViewModel : BaseViewModel
         Post != null && SessionManager.CurrentUser != null &&
         (Post.UserId == SessionManager.CurrentUser.UserId || SessionManager.IsAdmin);
 
+    // Admins moderate directly (Hide/Delete) rather than filing a report
+    // against their own review queue - Reporting is a Student-facing action.
+    public bool CanReport => !SessionManager.IsAdmin;
+
     public ICommand AddCommentCommand { get; }
     public ICommand DeleteCommentCommand { get; }
     public ICommand AddReactionCommand { get; }
@@ -140,6 +144,7 @@ public class PostDetailsViewModel : BaseViewModel
 
         OnPropertyChanged(nameof(Post));
         OnPropertyChanged(nameof(CanManagePost));
+        OnPropertyChanged(nameof(CanReport));
         OnPropertyChanged(nameof(ReactionSummary));
         IsBusy = false;
     }

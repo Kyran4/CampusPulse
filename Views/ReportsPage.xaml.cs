@@ -9,4 +9,12 @@ public partial class ReportsPage : ContentPage
         InitializeComponent();
         BindingContext = vm;
     }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (BindingContext is ReportsViewModel vm)
+            vm.RefreshCommand.Execute(null);
+    }
 }
