@@ -7,6 +7,15 @@ namespace CampusPulse;
 
 public partial class AppShell : Shell
 {
+    // Routes reachable without being signed in. Everything else is
+    // protected by the Navigating guard below - an allow-list rather than a
+    // growing block-list, so any new page added later is protected by
+    // default instead of accidentally left open.
+    private static readonly string[] PublicRoutes =
+    {
+        "LoginPage", "LoginPageFlyout", "RegisterPage", "RegisterPageFlyout"
+    };
+
     public AppShell()
     {
         InitializeComponent();
@@ -18,10 +27,31 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("RegisterPage", typeof(RegisterPage));
         Routing.RegisterRoute("LoginPage", typeof(LoginPage));
         Routing.RegisterRoute("CreateEventPage", typeof(CreateEventPage));
+
+        // Global auth guard - runs before every navigation, flyout tap
+        // included. Without this, a signed-out user could still reach
+        // Feed/Events/Profile/etc directly (e.g. by tapping a flyout item
+        // that's technically still registered) even though the menu tries
+        // to hide them.
+        Navigating += OnShellNavigating;
+
         // Check auth on startup
         _ = EnsureAuthenticatedAsync();
     }
 
+    private async void OnShellNavigating(object sender, ShellNavigatingEventArgs e)
+    {
+        var target = e.Target?.Location?.OriginalString ?? string.Empty;
+
+        var isPublic = PublicRoutes.Any(r => target.Contains(r, StringComparison.OrdinalIgnoreCase));
+        if (isPublic) return;
+
+        if (!SessionManager.IsLoggedIn)
+        {
+            e.Cancel();
+            await Shell.Current.GoToAsync("//LoginPage");
+        }
+    }
 
     public async Task EnsureAuthenticatedAsync()
     {
@@ -30,10 +60,12 @@ public partial class AppShell : Shell
 
         if (string.IsNullOrWhiteSpace(token))
         {
-            // Remove admin pages if any were added
+            // Remove admin/member-only pages if any were added
             RemoveAdminPages();
             RemoveCreatePostFlyout();
+            RemoveMemberPages();
             SessionManager.Logout();
+            AddAuthFlyout();
 
             // Redirect to login
             await Shell.Current.GoToAsync("//LoginPage");
@@ -47,12 +79,130 @@ public partial class AppShell : Shell
         var user = db.LoadUser<User>();
         SessionManager.CurrentUser = user;
 
+        RemoveAuthFlyout();
         AddCreatePostFlyout();
+        AddMemberPages();
 
         if (SessionManager.IsAdmin)
             AddAdminPages();
         else
             RemoveAdminPages();
+
+        // Explicit navigation rather than relying on whatever Shell's
+        // default initial route happened to be: that default navigation
+        // can fire before this async method finishes, when
+        // SessionManager.IsLoggedIn is still false - the Navigating guard
+        // would correctly-but-wrongly bounce it to Login. This makes the
+        // authenticated case deterministic regardless of that race.
+        await Shell.Current.GoToAsync("//FeedPage");
+    }
+
+    // ---------------------------------------------------------
+    // LOGIN / REGISTER FLYOUT (visible only when logged out)
+    // ---------------------------------------------------------
+    // Login/Register are declared in AppShell.xaml with
+    // FlyoutItemIsVisible="False" so they're never implicitly shown - the
+    // actual visible menu entries are these dynamically added ones,
+    // following the same pattern as AddCreatePostFlyout/AddAdminPages.
+    public void AddAuthFlyout()
+    {
+        if (Items.Any(i => i.Route == "LoginPageFlyout" || i.Route == "RegisterPageFlyout"))
+            return;
+
+        var login = new FlyoutItem
+        {
+            Title = "Sign In",
+            Route = "LoginPageFlyout",
+            Items =
+            {
+                new ShellContent
+                {
+                    Route = "LoginPageFlyout",
+                    ContentTemplate = new DataTemplate(typeof(LoginPage))
+                }
+            }
+        };
+
+        var register = new FlyoutItem
+        {
+            Title = "Register",
+            Route = "RegisterPageFlyout",
+            Items =
+            {
+                new ShellContent
+                {
+                    Route = "RegisterPageFlyout",
+                    ContentTemplate = new DataTemplate(typeof(RegisterPage))
+                }
+            }
+        };
+
+        Items.Add(login);
+        Items.Add(register);
+    }
+
+    public void RemoveAuthFlyout()
+    {
+        var authItems = Items
+            .Where(i => i.Route == "LoginPageFlyout" || i.Route == "RegisterPageFlyout")
+            .ToList();
+
+        foreach (var item in authItems)
+            Items.Remove(item);
+    }
+
+    // ---------------------------------------------------------
+    // MEMBER-ONLY PAGES (My Posts / My Interests) - visible only when
+    // signed in, same reasoning as Create Post/Admin pages. The static
+    // versions in AppShell.xaml are FlyoutItemIsVisible="False"; these
+    // dynamic ones (same Route values) are the actual visible entries.
+    // ---------------------------------------------------------
+    public void AddMemberPages()
+    {
+        if (Items.Any(i => i.Route == "MyPostsPage" || i.Route == "InterestsPage"))
+            return;
+
+        var myPosts = new FlyoutItem
+        {
+            Title = "My Posts",
+            Icon = "posts.png",
+            Route = "MyPostsPage",
+            Items =
+            {
+                new ShellContent
+                {
+                    Route = "MyPostsPage",
+                    ContentTemplate = new DataTemplate(typeof(MyPostsPage))
+                }
+            }
+        };
+
+        var interests = new FlyoutItem
+        {
+            Title = "My Interests",
+            Route = "InterestsPage",
+            Items =
+            {
+                new ShellContent
+                {
+                    Route = "InterestsPage",
+                    ContentTemplate = new DataTemplate(typeof(InterestsPage))
+                }
+            }
+        };
+
+        Items.Add(myPosts);
+        Items.Add(interests);
+    }
+
+    public void RemoveMemberPages()
+    {
+        var memberItems = Items
+            .Where(i => i.Route == "MyPostsPage" || i.Route == "InterestsPage")
+            .ToList();
+
+        foreach (var item in memberItems)
+            Items.Remove(item);
     }
 
     // ---------------------------------------------------------
@@ -182,61 +332,4 @@ public partial class AppShell : Shell
         if (item != null)
             Items.Remove(item);
     }
-
-    public void AddAuthFlyout()
-    {
-        // Prevent duplicates
-        if (Items.Any(i =>
-            i.Route == "LoginPage" ||
-            i.Route == "RegisterPage"))
-        {
-            return;
-        }
-
-        var login = new FlyoutItem
-        {
-            Title = "Login",
-            Icon = "login.png",
-            Route = "LoginPage",
-            Items =
-            {
-                new ShellContent
-                {
-                    Route = "LoginPage",
-                    ContentTemplate = new DataTemplate(typeof(LoginPage))
-                }
-            }
-        };
-
-        var register = new FlyoutItem
-        {
-            Title = "Register",
-            Icon = "register.png",
-            Route = "RegisterPage",
-            Items =
-            {
-                new ShellContent
-                {
-                    Route = "RegisterPage",
-                    ContentTemplate = new DataTemplate(typeof(RegisterPage))
-                }
-            }
-        };
-
-        Items.Add(login);
-        Items.Add(register);
-    }
-
-    public void RemoveAuthFlyout()
-    {
-        // Remove authentication-related flyout items (e.g., Login/Register links in unauthenticated state)
-        var authItems = Items
-            .Where(i =>
-                i.Route == "LoginPage" ||
-                i.Route == "RegisterPage")
-            .ToList();
-
-        foreach (var item in authItems)
-            Items.Remove(item);
-    }
-}  
+}

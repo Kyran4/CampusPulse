@@ -9,4 +9,12 @@ public partial class EventsPage : ContentPage
         InitializeComponent();
         BindingContext = vm;
     }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (BindingContext is EventsViewModel vm)
+            vm.RefreshCommand.Execute(null);
+    }
 }

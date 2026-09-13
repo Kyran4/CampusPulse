@@ -10,6 +10,7 @@
         <helpers:InvertedBoolConverter x:Key="InvertedBoolConverter" />
         <helpers:Base64OrUrlImageConverter x:Key="ImageConverter" />
         <helpers:StringHasValueConverter x:Key="HasImageConverter" />
+        <helpers:IsPendingConverter x:Key="IsPendingConverter" />
 
         <!-- ========================= -->
         <!--        COLOR PALETTE      -->

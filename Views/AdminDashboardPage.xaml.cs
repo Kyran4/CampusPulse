@@ -9,4 +9,12 @@ public partial class AdminDashboardPage : ContentPage
         InitializeComponent();
         BindingContext = vm;
     }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (BindingContext is AdminDashboardViewModel vm)
+            vm.RefreshCommand.Execute(null);
+    }
 }

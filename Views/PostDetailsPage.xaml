@@ -8,12 +8,12 @@
 
     <Grid RowDefinitions="Auto,*">
 
-        <!-- HEADER -->
+        <!-- Header -->
         <Grid BackgroundColor="{StaticResource PrimaryColor}" Padding="20">
             <Label Text="Post Details" Style="{StaticResource TitleLabel}" />
         </Grid>
 
-        <!-- CONTENT -->
+        <!-- Content -->
         <ScrollView Grid.Row="1">
             <VerticalStackLayout Padding="20" Spacing="20">
 
@@ -37,6 +37,8 @@
                         <!-- Only the post's owner (or an Admin) sees these -
                              the API re-checks ownership regardless, this
                              just avoids showing a button that would fail. -->
+                        
+                        
                         <HorizontalStackLayout Spacing="10"
                                                 IsVisible="{Binding CanManagePost}">
                             <Button Text="Edit"
@@ -50,12 +52,13 @@
 
                         <Button Text="Report Post"
                                 Style="{StaticResource PrimaryButton}"
+                                IsVisible="{Binding BindingContext.CanReport, Source={x:Reference RootPage}}"
                                 Command="{Binding BindingContext.ReportPostCommand, Source={x:Reference RootPage}}" />
 
                     </VerticalStackLayout>
                 </Frame>
 
-                <!-- Reaction Buttons - US-13: Like / Helpful / Interested -->
+                <!-- The Reaction Buttons (Like, Helpful, Interested)-->
                 <Label Text="{Binding ReactionSummary}" Style="{StaticResource BodyLabel}" />
                 <HorizontalStackLayout Spacing="10">
                     <Button Text="👍 Like"
@@ -79,6 +82,11 @@
 
                 <!-- Comments List -->
                 <CollectionView ItemsSource="{Binding Comments}" SelectionMode="None">
+                    <CollectionView.EmptyView>
+                        <Label Text="No comments yet - be the first to reply."
+                               HorizontalOptions="Center"
+                               Style="{StaticResource BodyLabel}" />
+                    </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Frame Style="{StaticResource Card}">

@@ -59,9 +59,13 @@ public class LoginViewModel : BaseViewModel
         shell?.RemoveAuthFlyout();
         shell?.RemoveCreatePostFlyout();
         shell?.RemoveAdminPages();
+        shell?.RemoveMemberPages();
 
         if (!string.IsNullOrWhiteSpace(result.Token))
+        {
             shell?.AddCreatePostFlyout();
+            shell?.AddMemberPages();
+        }
 
         if (SessionManager.IsAdmin)
             shell?.AddAdminPages();

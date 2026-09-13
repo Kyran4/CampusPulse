@@ -65,7 +65,7 @@ public class ProfileViewModel : BaseViewModel
     // Then refresh from the server - the cache could be stale if the
     // profile was updated on another device, or by an Admin action like
     // deactivation (Role/IsActive could have changed).
-    private async Task LoadFromServerAsync()
+    public async Task LoadFromServerAsync()
     {
         var user = await _users.GetMeAsync();
         if (user == null) return; // stay on cached values rather than blank the page on a network hiccup
@@ -135,6 +135,7 @@ public class ProfileViewModel : BaseViewModel
         var shell = Shell.Current as AppShell;
         shell?.RemoveAdminPages();
         shell?.RemoveCreatePostFlyout();
+        shell?.RemoveMemberPages();
         shell?.AddAuthFlyout();
 
         await _nav.GoToAsync("//LoginPage");

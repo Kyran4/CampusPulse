@@ -9,4 +9,12 @@ public partial class AdminUsersPage : ContentPage
         InitializeComponent();
         BindingContext = vm;
     }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (BindingContext is AdminUsersViewModel vm)
+            vm.RefreshCommand.Execute(null);
+    }
 }

@@ -69,6 +69,11 @@
                 <Label Text="Attendees" Style="{StaticResource SectionHeader}" />
 
                 <CollectionView ItemsSource="{Binding Attendees}" SelectionMode="None">
+                    <CollectionView.EmptyView>
+                        <Label Text="No one has joined yet."
+                               HorizontalOptions="Center"
+                               Style="{StaticResource BodyLabel}" />
+                    </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Frame Style="{StaticResource Card}">
