@@ -12,6 +12,8 @@ public class AuthenticationService
         _api = api;
     }
 
+    public string? LastError => _api.LastError;
+
     public async Task<AuthResponseDto?> LoginAsync(LoginRequest dto)
     {
         return await _api.PostAsync<AuthResponseDto>("api/auth/login", dto);

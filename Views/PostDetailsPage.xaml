@@ -8,12 +8,12 @@
 
     <Grid RowDefinitions="Auto,*">
 
-        <!-- Header -->
+        <!-- HEADER -->
         <Grid BackgroundColor="{StaticResource PrimaryColor}" Padding="20">
             <Label Text="Post Details" Style="{StaticResource TitleLabel}" />
         </Grid>
 
-        <!-- Content -->
+        <!-- CONTENT -->
         <ScrollView Grid.Row="1">
             <VerticalStackLayout Padding="20" Spacing="20">
 
@@ -37,8 +37,6 @@
                         <!-- Only the post's owner (or an Admin) sees these -
                              the API re-checks ownership regardless, this
                              just avoids showing a button that would fail. -->
-                        
-                        
                         <HorizontalStackLayout Spacing="10"
                                                 IsVisible="{Binding CanManagePost}">
                             <Button Text="Edit"
@@ -58,7 +56,7 @@
                     </VerticalStackLayout>
                 </Frame>
 
-                <!-- The Reaction Buttons (Like, Helpful, Interested)-->
+                <!-- Reaction Buttons - US-13: Like / Helpful / Interested -->
                 <Label Text="{Binding ReactionSummary}" Style="{StaticResource BodyLabel}" />
                 <HorizontalStackLayout Spacing="10">
                     <Button Text="👍 Like"

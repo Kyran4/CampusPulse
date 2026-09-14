@@ -8,16 +8,16 @@
 
     <Grid RowDefinitions="Auto,*">
 
-        
-        <!-- The Custom Header -->
-        
+        <!-- ========================= -->
+        <!--        CUSTOM HEADER      -->
+        <!-- ========================= -->
         <Grid BackgroundColor="{StaticResource PrimaryColor}" Padding="20">
             <Label Text="Create Account" Style="{StaticResource TitleLabel}" />
         </Grid>
 
-        
-        <!-- The Main Content -->
-        
+        <!-- ========================= -->
+        <!--        MAIN CONTENT       -->
+        <!-- ========================= -->
         <ScrollView Grid.Row="1">
             <VerticalStackLayout Padding="20" Spacing="20">
 
@@ -50,7 +50,12 @@
                 <Button
                     Text="Register"
                     Style="{StaticResource PrimaryButton}"
+                    IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
                     Command="{Binding RegisterCommand}" />
+
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                    IsVisible="{Binding IsBusy}"
+                                    Color="{StaticResource PrimaryColor}" />
 
                 <!-- Login Link -->
                 <Label

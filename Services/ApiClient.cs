@@ -5,7 +5,6 @@ namespace CampusPulse.Services;
 
 public class ApiClient
 {
-
     // Leave blank to use the automatic per-platform defaults below (fine
     // when everything runs on one machine - an emulator plus the API on
     // your own laptop). Fill in your machine's LAN IP (the one running the
@@ -52,6 +51,26 @@ public class ApiClient
 #endif
     }
 
+    // Set whenever a call fails, so callers that got back null/empty can
+    // tell "the server legitimately returned nothing" apart from "we
+    // couldn't reach the server at all" and show the right message.
+    public string? LastError { get; private set; }
+
+    // A timed-out request throws TaskCanceledException, which reads like
+    // "the user cancelled this" rather than "this device couldn't reach the
+    // server in time" - the actual, much more common cause (wrong ServerIp,
+    // different network, firewall). Centralising this so every method
+    // reports the same clear reason instead of a confusing exception name.
+    private string DescribeException(Exception ex, string method, string endpoint)
+    {
+        string reason = ex is TaskCanceledException or TimeoutException
+            ? "Couldn't reach the server in time. Check ServerIp in ApiClient.cs is set to the API host's current IP, and that this device is on the same network."
+            : ex.Message;
+
+        Console.WriteLine($"API Error ({method} {endpoint}): {reason}");
+        return reason;
+    }
+
     public async Task<T?> GetAsync<T>(string endpoint)
     {
         try
@@ -60,20 +79,10 @@ public class ApiClient
         }
         catch (Exception ex)
         {
-            // Surfaced to Console so it shows in the debug output - if
-            // every call is failing with this, it's almost always the base
-            // URL not matching whatever you're running the app on (see
-            // GetBaseUrl above), not a bug in the calling page.
-            Console.WriteLine("API Error (GET " + endpoint + "): " + ex.Message);
-            LastError = ex.Message;
+            LastError = DescribeException(ex, "GET", endpoint);
             return default;
         }
     }
-
-    // Set whenever a call fails, so callers that got back null/empty can
-    // tell "the server legitimately returned nothing" apart from "we
-    // couldn't reach the server at all" and show the right message.
-    public string? LastError { get; private set; }
 
     public async Task<bool> PostAsync(string endpoint, object data)
     {
@@ -84,8 +93,7 @@ public class ApiClient
         }
         catch (Exception ex)
         {
-            Console.WriteLine("API Error (POST " + endpoint + "): " + ex.Message);
-            LastError = ex.Message;
+            LastError = DescribeException(ex, "POST", endpoint);
             return false;
         }
     }
@@ -108,8 +116,7 @@ public class ApiClient
         }
         catch (Exception ex)
         {
-            Console.WriteLine("API Error (POST " + url + "): " + ex.Message);
-            LastError = ex.Message;
+            LastError = DescribeException(ex, "POST", url);
             return default;
         }
     }
@@ -123,8 +130,7 @@ public class ApiClient
         }
         catch (Exception ex)
         {
-            Console.WriteLine("API Error (PUT " + endpoint + "): " + ex.Message);
-            LastError = ex.Message;
+            LastError = DescribeException(ex, "PUT", endpoint);
             return false;
         }
     }
@@ -147,8 +153,7 @@ public class ApiClient
         }
         catch (Exception ex)
         {
-            Console.WriteLine("API Error (PUT " + endpoint + "): " + ex.Message);
-            LastError = ex.Message;
+            LastError = DescribeException(ex, "PUT", endpoint);
             return default;
         }
     }
@@ -162,8 +167,7 @@ public class ApiClient
         }
         catch (Exception ex)
         {
-            Console.WriteLine("API Error (DELETE " + endpoint + "): " + ex.Message);
-            LastError = ex.Message;
+            LastError = DescribeException(ex, "DELETE", endpoint);
             return false;
         }
     }

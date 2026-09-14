@@ -38,15 +38,25 @@ public class LoginViewModel : BaseViewModel
             return;
         }
 
-        var result = await _auth.LoginAsync(new LoginRequest
+        IsBusy = true;
+        AuthResponseDto? result;
+        try
         {
-            Email = Email,
-            Password = Password
-        });
+            result = await _auth.LoginAsync(new LoginRequest
+            {
+                Email = Email,
+                Password = Password
+            });
+        }
+        finally
+        {
+            IsBusy = false;
+        }
 
         if (result == null)
         {
-            await _dialog.ShowAlert("Login Failed", "Invalid email or password.");
+            var detail = string.IsNullOrWhiteSpace(_auth.LastError) ? "" : $"\n\n({_auth.LastError})";
+            await _dialog.ShowAlert("Login Failed", "Invalid email or password." + detail);
             return;
         }
 
