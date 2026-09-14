@@ -39,7 +39,17 @@ public static class MauiProgram
         builder.Services.AddTransient<ApiAuthHandler>();
 
         builder.Services
-            .AddHttpClient<ApiClient>()
+            .AddHttpClient<ApiClient>(client =>
+            {
+                // Default HttpClient timeout is 100 seconds - if a device
+                // can't actually reach the API (wrong ServerIp, not on the
+                // same network, firewall blocking it), a request just hangs
+                // silently for up to that long with no visible feedback,
+                // which looks exactly like "nothing happens" rather than an
+                // obvious, fast failure. 15s is still generous for a normal
+                // request but means a connection problem surfaces quickly.
+                client.Timeout = TimeSpan.FromSeconds(15);
+            })
             .AddHttpMessageHandler<ApiAuthHandler>();
 
         // ============================

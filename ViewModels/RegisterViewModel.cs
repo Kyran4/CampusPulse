@@ -53,16 +53,26 @@ public class RegisterViewModel : BaseViewModel
             return;
         }
 
-        var result = await _auth.RegisterAsync(new RegisterRequest
+        IsBusy = true;
+        AuthResponseDto? result;
+        try
         {
-            DisplayName = DisplayName,
-            Email = Email,
-            Password = Password
-        });
+            result = await _auth.RegisterAsync(new RegisterRequest
+            {
+                DisplayName = DisplayName,
+                Email = Email,
+                Password = Password
+            });
+        }
+        finally
+        {
+            IsBusy = false;
+        }
 
         if (result == null)
         {
-            await _dialog.ShowAlert("Registration Failed", "Could not create account. The email may already be in use.");
+            var detail = string.IsNullOrWhiteSpace(_auth.LastError) ? "" : $"\n\n({_auth.LastError})";
+            await _dialog.ShowAlert("Registration Failed", "Could not create account. The email may already be in use." + detail);
             return;
         }
 
