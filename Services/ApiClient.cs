@@ -21,7 +21,7 @@ public class ApiClient
     // All devices (the API host and every phone/tablet/laptop testing
     // against it) need to be on the same WiFi network, and Windows
     // Firewall needs to allow inbound connections on port 5162.
-    private const string ServerIp = "172.21.64.1"; // e.g. "192.168.1.23"
+    private const string ServerIp = "172.25.240.1"; // e.g. "192.168.1.23"
 
     private readonly HttpClient _http;
 
