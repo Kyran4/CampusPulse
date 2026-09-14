@@ -31,7 +31,7 @@ public class EventDetailsViewModel : BaseViewModel
         set
         {
             _eventId = value;
-            _ = LoadEventAsync();
+            _ = RefreshAsync();
         }
     }
 
@@ -53,7 +53,7 @@ public class EventDetailsViewModel : BaseViewModel
     public ICommand JoinCommand { get; }
     public ICommand LeaveCommand { get; }
 
-    private async Task LoadEventAsync()
+    public async Task RefreshAsync()
     {
         IsBusy = true;
 
@@ -89,7 +89,7 @@ public class EventDetailsViewModel : BaseViewModel
         if (!ok)
             await _dialog.ShowAlert("Couldn't join", "This event may be full, cancelled, or already happened.");
 
-        await LoadEventAsync();
+        await RefreshAsync();
     }
 
     private async Task LeaveEventAsync()
@@ -102,6 +102,6 @@ public class EventDetailsViewModel : BaseViewModel
 
         var dto = new EventJoinDto { EventId = EventId };
         await _events.LeaveEventAsync(dto);
-        await LoadEventAsync();
+        await RefreshAsync();
     }
 }

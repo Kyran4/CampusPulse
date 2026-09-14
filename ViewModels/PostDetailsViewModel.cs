@@ -65,7 +65,7 @@ public class PostDetailsViewModel : BaseViewModel
         set
         {
             _postId = value;
-            _ = LoadPostAsync();
+            _ = RefreshAsync();
         }
     }
 
@@ -101,7 +101,7 @@ public class PostDetailsViewModel : BaseViewModel
     public ICommand DeletePostCommand { get; }
     public ICommand ReportPostCommand { get; }
 
-    private async Task LoadPostAsync()
+    public async Task RefreshAsync()
     {
         IsBusy = true;
 
@@ -229,7 +229,7 @@ public class PostDetailsViewModel : BaseViewModel
             return;
         }
 
-        await LoadPostAsync();
+        await RefreshAsync();
     }
 
     private async Task EditPostAsync()

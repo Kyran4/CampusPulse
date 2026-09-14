@@ -5,6 +5,24 @@ namespace CampusPulse.Services;
 
 public class ApiClient
 {
+
+    // Leave blank to use the automatic per-platform defaults below (fine
+    // when everything runs on one machine - an emulator plus the API on
+    // your own laptop). Fill in your machine's LAN IP (the one running the
+    // API) when testing on real, separate devices over WiFi, e.g.:
+    //
+    //     private const string ServerIp = "192.168.1.23";
+    //
+    // How to find it (on the machine running the API):
+    //   Windows: open Command Prompt, run "ipconfig", look for
+    //            "IPv4 Address" under your active Wi-Fi adapter.
+    //   Mac:     System Settings -> Wi-Fi -> Details, or run
+    //            "ipconfig getifaddr en0" in Terminal.
+    // All devices (the API host and every phone/tablet/laptop testing
+    // against it) need to be on the same WiFi network, and Windows
+    // Firewall needs to allow inbound connections on port 5162.
+    private const string ServerIp = "172.21.64.1"; // e.g. "192.168.1.23"
+
     private readonly HttpClient _http;
 
     public ApiClient(HttpClient http)
@@ -20,12 +38,13 @@ public class ApiClient
     // MAUI SDK already defines per target framework, so each platform build
     // gets the right constant baked in.
     //
-    // Physical device (real phone, not an emulator/simulator): neither of
-    // these works - use your PC's actual LAN IP instead, e.g.
-    // "http://192.168.1.23:5162", and make sure the phone is on the same
-    // network and Windows Firewall allows inbound on that port.
+    // ServerIp above always wins when set, regardless of platform - that's
+    // the switch for "everyone's on their own real device now."
     private static string GetBaseUrl()
     {
+        if (!string.IsNullOrWhiteSpace(ServerIp))
+            return $"http://{ServerIp}:5162";
+
 #if ANDROID
         return "http://10.0.2.2:5162";
 #else
