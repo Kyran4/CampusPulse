@@ -35,8 +35,21 @@ public partial class AppShell : Shell
         // to hide them.
         Navigating += OnShellNavigating;
 
-        // Check auth on startup
-        _ = EnsureAuthenticatedAsync();
+        // Check auth on startup - deliberately on Loaded, not fired
+        // directly here. The constructor runs before the native flyout
+        // control has actually finished initializing, so adding flyout
+        // items (AddAdminPages/AddMemberPages/etc) this early sometimes
+        // doesn't get picked up by the rendered flyout until something
+        // else forces a refresh - which is exactly why logging out and
+        // back in "fixed" it: that's a full Shell navigation reset, not a
+        // real fix. Loaded fires once the control is actually ready.
+        Loaded += OnShellLoaded;
+    }
+
+    private async void OnShellLoaded(object sender, EventArgs e)
+    {
+        Loaded -= OnShellLoaded;
+        await EnsureAuthenticatedAsync();
     }
 
     private async void OnShellNavigating(object sender, ShellNavigatingEventArgs e)

@@ -5,6 +5,8 @@ namespace CampusPulse.Views;
 
 public partial class FeedPage : ContentPage
 {
+    private IDispatcherTimer _pollTimer;
+
     public FeedPage(FeedViewModel vm)
     {
         InitializeComponent();
@@ -32,5 +34,23 @@ public partial class FeedPage : ContentPage
         // every time you actually land on this page, it's current.
         if (BindingContext is FeedViewModel vm)
             vm.RefreshCommand.Execute(null);
+
+        // Poll every 7s while this page is actually visible, so posts
+        // created by other users show up without a manual refresh. A fresh
+        // timer is created each time the page appears and torn down in
+        // OnDisappearing - reusing one timer across visits would mean each
+        // visit adds another Tick subscriber, firing the refresh multiple
+        // times per tick.
+        _pollTimer = Application.Current.Dispatcher.CreateTimer();
+        _pollTimer.Interval = TimeSpan.FromSeconds(7);
+        _pollTimer.Tick += (s, e) => (BindingContext as FeedViewModel)?.RefreshCommand.Execute(null);
+        _pollTimer.Start();
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        _pollTimer?.Stop();
+        _pollTimer = null;
     }
 }
