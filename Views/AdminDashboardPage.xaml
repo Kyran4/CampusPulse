@@ -12,8 +12,8 @@
             <Label Text="Admin Dashboard" Style="{StaticResource TitleLabel}" />
         </Grid>
 
-        <!-- Stats - Should priority Admin story: total users, active users,
-             post count, event count, pending reports -->
+        <!-- The Stats below prioritize Admin story, total users, active users,
+        post count, event count, and pending reports -->
         <Frame Grid.Row="1" Style="{StaticResource Card}" Margin="20,20,20,0">
             <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" RowSpacing="10">
                 <VerticalStackLayout Grid.Column="0" Grid.Row="0">

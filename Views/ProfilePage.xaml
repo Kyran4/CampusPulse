@@ -8,12 +8,12 @@
 
     <Grid RowDefinitions="Auto,*">
 
-        <!-- HEADER -->
+        <!-- Header -->
         <Grid BackgroundColor="{StaticResource PrimaryColor}" Padding="20">
             <Label Text="My Profile" Style="{StaticResource TitleLabel}" />
         </Grid>
 
-        <!-- CONTENT -->
+        <!-- Content -->
         <ScrollView Grid.Row="1">
             <VerticalStackLayout Padding="20" Spacing="16">
 
