@@ -20,7 +20,7 @@ public partial class EventDetailsPage : ContentPage
         // and capacity while you're looking at the event.
         _pollTimer = Application.Current.Dispatcher.CreateTimer();
         _pollTimer.Interval = TimeSpan.FromSeconds(7);
-        _pollTimer.Tick += (s, e) => _ = (BindingContext as EventDetailsViewModel)?.RefreshAsync();
+        _pollTimer.Tick += (s, e) => _ = (BindingContext as EventDetailsViewModel)?.RefreshAsync(showErrorAlert: false);
         _pollTimer.Start();
     }
 

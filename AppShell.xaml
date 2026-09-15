@@ -3,40 +3,47 @@
     x:Class="CampusPulse.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:views="clr-namespace:CampusPulse.Views">
+    xmlns:views="clr-namespace:CampusPulse.Views"
+    FlyoutBehavior="Disabled">
 
-    <!-- Flyout Menu -->
-    <FlyoutItem Title="Feed" Icon="feed.png" Route="FeedPage">
-        <ShellContent Route="FeedPage" ContentTemplate="{DataTemplate views:FeedPage}" />
-    </FlyoutItem>
+    <!-- No more hamburger/flyout menu - FlyoutBehavior="Disabled" above
+         removes that affordance entirely, regardless of how many top-level
+         items exist below. All navigation between Login/Register and the
+         main app happens through code (GoToAsync), same as before - this
+         setting only changes how it's presented, not how it's reached. -->
 
-    <FlyoutItem Title="Events" Icon="events.png" Route="EventsPage">
-        <ShellContent Route="EventsPage" ContentTemplate="{DataTemplate views:EventsPage}" />
-    </FlyoutItem>
+    <!-- Pre-auth screens - shown full-screen, no bottom tabs, until the
+         Navigating guard (see AppShell.xaml.cs) lets you past them. -->
+    <ShellContent Route="LoginPage" ContentTemplate="{DataTemplate views:LoginPage}" />
+    <ShellContent Route="RegisterPage" ContentTemplate="{DataTemplate views:RegisterPage}" />
 
-    <FlyoutItem Title="My Posts" Icon="posts.png" Route="MyPostsPage" Shell.FlyoutItemIsVisible="False">
-        <ShellContent Route="MyPostsPage" ContentTemplate="{DataTemplate views:MyPostsPage}" />
-    </FlyoutItem>
+    <!-- Main app - Instagram-style bottom tab bar. This replaces the old
+         flyout list of FeedPage/EventsPage/MyPostsPage/ProfilePage entries.
+         "Admin" is added/removed from this TabBar's Items at runtime (see
+         AddAdminTab/RemoveAdminTab in the code-behind) rather than being
+         declared here, since it should only ever appear for Admins. -->
+    <TabBar x:Name="MainTabBar" Route="MainTabs">
 
-    <FlyoutItem Title="Profile" Icon="profile.png" Route="ProfilePage">
-        <ShellContent Route="ProfilePage" ContentTemplate="{DataTemplate views:ProfilePage}" />
-    </FlyoutItem>
+        <Tab Title="Feed" Icon="feed.png" Route="FeedPage">
+            <ShellContent Route="FeedPage" ContentTemplate="{DataTemplate views:FeedPage}" />
+        </Tab>
 
-    <FlyoutItem Title="My Interests" Route="InterestsPage" Shell.FlyoutItemIsVisible="False">
-        <ShellContent Route="InterestsPage" ContentTemplate="{DataTemplate views:InterestsPage}" />
-    </FlyoutItem>
+        <Tab Title="Events" Icon="events.png" Route="EventsPage">
+            <ShellContent Route="EventsPage" ContentTemplate="{DataTemplate views:EventsPage}" />
+        </Tab>
 
-    <!-- Standalone Routes - FlyoutItemIsVisible="False" keeps these out of
-         the flyout menu entirely. Without it, Shell auto-wraps every
-         top-level ShellContent into its own visible, tappable flyout entry -
-         which is why Login/Register (and these others) were showing up and
-         staying clickable regardless of the runtime show/hide logic in
-         AppShell.xaml.cs. These pages are only ever reached via GoToAsync. -->
-    <ShellContent Route="CreatePostPage" Shell.FlyoutItemIsVisible="False" ContentTemplate="{DataTemplate views:CreatePostPage}" />
-    <ShellContent Route="EventDetailsPage" Shell.FlyoutItemIsVisible="False" ContentTemplate="{DataTemplate views:EventDetailsPage}" />
-    <ShellContent Route="PostDetailsPage" Shell.FlyoutItemIsVisible="False" ContentTemplate="{DataTemplate views:PostDetailsPage}" />
-    <ShellContent Route="RegisterPage" Shell.FlyoutItemIsVisible="False" ContentTemplate="{DataTemplate views:RegisterPage}" />
-    <ShellContent Route="LoginPage" Shell.FlyoutItemIsVisible="False" ContentTemplate="{DataTemplate views:LoginPage}" />
-    <ShellContent Route="CreateEventPage" Shell.FlyoutItemIsVisible="False" ContentTemplate="{DataTemplate views:CreateEventPage}" />
+        <Tab Title="Create" Icon="create.png" Route="CreatePostPage">
+            <ShellContent Route="CreatePostPage" ContentTemplate="{DataTemplate views:CreatePostPage}" />
+        </Tab>
+
+        <Tab Title="My Posts" Icon="posts.png" Route="MyPostsPage">
+            <ShellContent Route="MyPostsPage" ContentTemplate="{DataTemplate views:MyPostsPage}" />
+        </Tab>
+
+        <Tab Title="Profile" Icon="profile.png" Route="ProfilePage">
+            <ShellContent Route="ProfilePage" ContentTemplate="{DataTemplate views:ProfilePage}" />
+        </Tab>
+
+    </TabBar>
 
 </Shell>

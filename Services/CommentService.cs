@@ -11,6 +11,8 @@ public class CommentService
         _api = api;
     }
 
+    public string? LastError => _api.LastError;
+
     public async Task<List<Comment>?> GetCommentsAsync(int postId)
     {
         return await _api.GetAsync<List<Comment>>($"api/comments/{postId}");

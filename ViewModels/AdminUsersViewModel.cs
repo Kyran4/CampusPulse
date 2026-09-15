@@ -35,7 +35,7 @@ public class AdminUsersViewModel : BaseViewModel
     public ICommand DeactivateCommand { get; }
     public ICommand ReactivateCommand { get; }
 
-    private async Task LoadAsync()
+    private async Task LoadAsync(bool showErrorAlert = true)
     {
         IsBusy = true;
 
@@ -47,13 +47,15 @@ public class AdminUsersViewModel : BaseViewModel
             foreach (var u in list)
                 Users.Add(u);
         }
-        else
+        else if (showErrorAlert)
         {
             await _dialog.ShowAlert("Error", "Couldn't load users." + (string.IsNullOrWhiteSpace(_admin.LastError) ? "" : $"\n\n({_admin.LastError})"));
         }
 
         IsBusy = false;
     }
+
+    public async Task PollAsync() => await LoadAsync(showErrorAlert: false);
 
     private async Task DeactivateAsync(UserAdminDto user)
     {

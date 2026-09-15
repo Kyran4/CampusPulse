@@ -21,7 +21,7 @@ public class RegisterViewModel : BaseViewModel
         _dialog = dialog;
 
         RegisterCommand = new Command(async () => await RegisterAsync());
-        GoToLoginCommand = new Command(async () => await _nav.GoToAsync("LoginPage"));
+        GoToLoginCommand = new Command(async () => await _nav.GoToAsync("//LoginPage"));
     }
 
     public string DisplayName { get; set; } = string.Empty;
@@ -80,19 +80,10 @@ public class RegisterViewModel : BaseViewModel
         await _db.SaveTokenAsync(result.Token);
         SessionManager.CurrentUser = result.User;
 
+        // New accounts are always Student - no Admin tab to add.
         var shell = Shell.Current as AppShell;
+        shell?.RemoveAdminTab();
 
-        shell?.RemoveAuthFlyout();
-        shell?.RemoveCreatePostFlyout();
-        shell?.RemoveAdminPages(); // new accounts are always Student
-        shell?.RemoveMemberPages();
-
-        if (!string.IsNullOrWhiteSpace(result.Token))
-        {
-            shell?.AddCreatePostFlyout();
-            shell?.AddMemberPages();
-        }
-
-        await _nav.GoToAsync("//FeedPage");
+        await _nav.GoToAsync("//MainTabs");
     }
 }

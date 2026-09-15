@@ -128,15 +128,12 @@ public class ProfileViewModel : BaseViewModel
         _db.ClearUser();
         SessionManager.Logout();
 
-        // This was the actual bug: logging out cleared the token/user but
-        // never touched the flyout itself, so the Admin/Create-Post menu
-        // items added at login just stayed there until the NEXT login (as
-        // a non-admin) happened to call RemoveAdminPages() as a side effect.
+        // Removes the Admin tab if it was there - the fixed tabs
+        // themselves aren't part of the flyout anymore, so there's nothing
+        // else to tear down; the Navigating guard blocks access to them
+        // the moment SessionManager reports logged-out anyway.
         var shell = Shell.Current as AppShell;
-        shell?.RemoveAdminPages();
-        shell?.RemoveCreatePostFlyout();
-        shell?.RemoveMemberPages();
-        shell?.AddAuthFlyout();
+        shell?.RemoveAdminTab();
 
         await _nav.GoToAsync("//LoginPage");
     }

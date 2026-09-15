@@ -43,7 +43,7 @@ public partial class FeedPage : ContentPage
         // times per tick.
         _pollTimer = Application.Current.Dispatcher.CreateTimer();
         _pollTimer.Interval = TimeSpan.FromSeconds(7);
-        _pollTimer.Tick += (s, e) => (BindingContext as FeedViewModel)?.RefreshCommand.Execute(null);
+        _pollTimer.Tick += (s, e) => _ = (BindingContext as FeedViewModel)?.PollAsync();
         _pollTimer.Start();
     }
 

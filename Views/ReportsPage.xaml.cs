@@ -23,7 +23,7 @@ public partial class ReportsPage : ContentPage
         // Admin, while this page is open.
         _pollTimer = Application.Current.Dispatcher.CreateTimer();
         _pollTimer.Interval = TimeSpan.FromSeconds(7);
-        _pollTimer.Tick += (s, e) => (BindingContext as ReportsViewModel)?.RefreshCommand.Execute(null);
+        _pollTimer.Tick += (s, e) => _ = (BindingContext as ReportsViewModel)?.PollAsync();
         _pollTimer.Start();
     }
 

@@ -28,7 +28,7 @@ public class FeedViewModel : BaseViewModel
         RefreshCommand = new Command(async () => await LoadFeedAsync());
         CreatePostCommand = new Command(async () => await _nav.GoToAsync("CreatePostPage"));
         OpenPostCommand = new Command<Post>(async (post) => await OpenPostAsync(post));
-        ManageInterestsCommand = new Command(async () => await _nav.GoToAsync("//InterestsPage"));
+        ManageInterestsCommand = new Command(async () => await _nav.GoToAsync("InterestsPage"));
 
         _ = InitAsync();
     }
@@ -95,20 +95,17 @@ public class FeedViewModel : BaseViewModel
         SelectedCategory = Categories.First();
     }
 
-    private async Task LoadFeedAsync()
+    private async Task LoadFeedAsync(bool showErrorAlert = true)
     {
         IsBusy = true;
 
         List<Post>? feed;
+        string? error = null;
 
         if (ShowFollowingOnly)
         {
             feed = await _follows.GetFollowingFeedAsync();
-
-            if (feed == null)
-            {
-                await _dialog.ShowAlert("Error", "Couldn't load your followed feed." + (string.IsNullOrWhiteSpace(_follows.LastError) ? "" : $"\n\n({_follows.LastError})"));
-            }
+            error = _follows.LastError;
         }
         else
         {
@@ -117,6 +114,20 @@ public class FeedViewModel : BaseViewModel
                 : (int?)null;
 
             feed = await _posts.GetFeedAsync(categoryId);
+            error = _posts.LastError;
+        }
+
+        // Previously this branch never checked for failure at all - a
+        // failed request just silently cleared the list with no
+        // explanation, which is exactly what "posts don't show up, no
+        // error, nothing" looks like. showErrorAlert is false during the
+        // background poll (see FeedPage's timer) so a dropped connection
+        // doesn't pop up a dialog every 7 seconds - it only surfaces loudly
+        // on an explicit load (first open, pull-to-refresh, changing the
+        // category filter).
+        if (feed == null && showErrorAlert)
+        {
+            await _dialog.ShowAlert("Error", "Couldn't load the feed." + (string.IsNullOrWhiteSpace(error) ? "" : $"\n\n({error})"));
         }
 
         Posts.Clear();
@@ -129,6 +140,11 @@ public class FeedViewModel : BaseViewModel
 
         IsBusy = false;
     }
+
+    // Called by the background poll timer - same reload, but failures are
+    // logged (via ApiClient.LastError/Console) rather than shown, since a
+    // silent poll failing shouldn't interrupt whatever the user's doing.
+    public async Task PollAsync() => await LoadFeedAsync(showErrorAlert: false);
 
     private async Task OpenPostAsync(Post post)
     {

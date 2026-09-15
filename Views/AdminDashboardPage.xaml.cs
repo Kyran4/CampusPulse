@@ -23,7 +23,7 @@ public partial class AdminDashboardPage : ContentPage
         // an admin is looking at the dashboard.
         _pollTimer = Application.Current.Dispatcher.CreateTimer();
         _pollTimer.Interval = TimeSpan.FromSeconds(7);
-        _pollTimer.Tick += (s, e) => (BindingContext as AdminDashboardViewModel)?.RefreshCommand.Execute(null);
+        _pollTimer.Tick += (s, e) => _ = (BindingContext as AdminDashboardViewModel)?.PollAsync();
         _pollTimer.Start();
     }
 

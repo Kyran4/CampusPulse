@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="CampusPulse.Views.AdminHubPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="{StaticResource LightGray}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <Grid BackgroundColor="{StaticResource PrimaryColor}" Padding="20">
+            <Label Text="Admin" Style="{StaticResource TitleLabel}" />
+        </Grid>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="20" Spacing="16">
+
+                <Frame Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Dashboard" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource SecondaryColor}" />
+                        <Label Text="Site-wide stats: users, posts, events, pending reports." Style="{StaticResource BodyLabel}" />
+                        <Button Text="Open Dashboard" Style="{StaticResource PrimaryButton}" Command="{Binding OpenDashboardCommand}" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Moderation" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource SecondaryColor}" />
+                        <Label Text="Pending reports awaiting a decision." Style="{StaticResource BodyLabel}" />
+                        <Button Text="Open Moderation" Style="{StaticResource PrimaryButton}" Command="{Binding OpenModerationCommand}" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Reports" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource SecondaryColor}" />
+                        <Label Text="Full report history, including reviewed/dismissed." Style="{StaticResource BodyLabel}" />
+                        <Button Text="Open Reports" Style="{StaticResource PrimaryButton}" Command="{Binding OpenReportsCommand}" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Manage Users" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource SecondaryColor}" />
+                        <Label Text="Search users, deactivate or reactivate accounts." Style="{StaticResource BodyLabel}" />
+                        <Button Text="Open Users" Style="{StaticResource PrimaryButton}" Command="{Binding OpenUsersCommand}" />
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+</ContentPage>

@@ -11,6 +11,8 @@ public class EventService
         _api = api;
     }
 
+    public string? LastError => _api.LastError;
+
     public async Task<List<Event>?> GetEventsAsync()
     {
         return await _api.GetAsync<List<Event>>("api/events");

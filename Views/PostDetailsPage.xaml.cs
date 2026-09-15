@@ -20,7 +20,7 @@ public partial class PostDetailsPage : ContentPage
         // up while you're reading, not just next time you open the post.
         _pollTimer = Application.Current.Dispatcher.CreateTimer();
         _pollTimer.Interval = TimeSpan.FromSeconds(7);
-        _pollTimer.Tick += (s, e) => _ = (BindingContext as PostDetailsViewModel)?.RefreshAsync();
+        _pollTimer.Tick += (s, e) => _ = (BindingContext as PostDetailsViewModel)?.RefreshAsync(showErrorAlert: false);
         _pollTimer.Start();
     }
 

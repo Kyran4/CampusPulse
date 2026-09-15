@@ -101,13 +101,23 @@ public class PostDetailsViewModel : BaseViewModel
     public ICommand DeletePostCommand { get; }
     public ICommand ReportPostCommand { get; }
 
-    public async Task RefreshAsync()
+    public async Task RefreshAsync(bool showErrorAlert = true)
     {
         IsBusy = true;
 
         Post = await _posts.GetPostAsync(PostId);
         var comments = await _comments.GetCommentsAsync(PostId);
         var reactions = await _reactions.GetReactionsAsync(PostId);
+
+        // The API call that actually tells us the request failed (vs the
+        // post genuinely not existing) is the post fetch - Post.GetPostAsync
+        // pulls from the feed endpoint, so a null result here on a page
+        // that was reached by tapping an actual post is almost always a
+        // connection problem, not a missing post.
+        if (Post == null && showErrorAlert)
+        {
+            await _dialog.ShowAlert("Error", "Couldn't load this post." + (string.IsNullOrWhiteSpace(_posts.LastError) ? "" : $"\n\n({_posts.LastError})"));
+        }
 
         Comments.Clear();
         if (comments != null)

@@ -39,11 +39,17 @@ public class EventsViewModel : BaseViewModel
     public ICommand OpenEventCommand { get; }
     public ICommand CancelEventCommand { get; }
 
-    private async Task LoadEventsAsync()
+    private async Task LoadEventsAsync(bool showErrorAlert = true)
     {
         IsBusy = true;
 
         var list = await _events.GetEventsAsync();
+
+        if (list == null && showErrorAlert)
+        {
+            await _dialog.ShowAlert("Error", "Couldn't load events." + (string.IsNullOrWhiteSpace(_events.LastError) ? "" : $"\n\n({_events.LastError})"));
+        }
+
         Events.Clear();
 
         if (list != null)
@@ -55,6 +61,9 @@ public class EventsViewModel : BaseViewModel
         OnPropertyChanged(nameof(IsAdmin));
         IsBusy = false;
     }
+
+    // Silent variant for the background poll timer - see FeedViewModel.PollAsync for why.
+    public async Task PollAsync() => await LoadEventsAsync(showErrorAlert: false);
 
     public async Task OpenEventAsync(Event ev)
     {

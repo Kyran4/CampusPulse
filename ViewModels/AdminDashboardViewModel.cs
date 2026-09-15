@@ -46,7 +46,7 @@ public class AdminDashboardViewModel : BaseViewModel
     public ICommand OpenPostCommand { get; }
     public ICommand HidePostCommand { get; }
 
-    private async Task LoadAsync()
+    private async Task LoadAsync(bool showErrorAlert = true)
     {
         IsBusy = true;
 
@@ -55,7 +55,7 @@ public class AdminDashboardViewModel : BaseViewModel
         {
             Stats = stats;
         }
-        else
+        else if (showErrorAlert)
         {
             // Distinguishing this from "genuinely zero" - if you see this,
             // it's a permissions/connection problem (this endpoint requires
@@ -74,6 +74,10 @@ public class AdminDashboardViewModel : BaseViewModel
 
         IsBusy = false;
     }
+
+    // Silent variant for the background poll timer - a dropped connection
+    // shouldn't pop up a dialog every 7 seconds.
+    public async Task PollAsync() => await LoadAsync(showErrorAlert: false);
 
     public async Task OpenPostAsync(Post post)
     {

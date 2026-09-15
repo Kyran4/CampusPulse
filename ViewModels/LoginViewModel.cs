@@ -21,7 +21,7 @@ public class LoginViewModel : BaseViewModel
         _dialog = dialog;
 
         LoginCommand = new Command(async () => await LoginAsync());
-        GoToRegisterCommand = new Command(async () => await _nav.GoToAsync("RegisterPage"));
+        GoToRegisterCommand = new Command(async () => await _nav.GoToAsync("//RegisterPage"));
     }
 
     public string Email { get; set; } = string.Empty;
@@ -64,22 +64,17 @@ public class LoginViewModel : BaseViewModel
         await _db.SaveTokenAsync(result.Token);
         SessionManager.CurrentUser = result.User;
 
+        // Admin gets the extra "Admin" tab added to the bottom bar; the
+        // fixed tabs (Feed/Events/Create/My Posts/Profile) don't need any
+        // show/hide logic - they're always there once you're signed in at
+        // all, same as any normal app's bottom nav.
         var shell = Shell.Current as AppShell;
 
-        shell?.RemoveAuthFlyout();
-        shell?.RemoveCreatePostFlyout();
-        shell?.RemoveAdminPages();
-        shell?.RemoveMemberPages();
-
-        if (!string.IsNullOrWhiteSpace(result.Token))
-        {
-            shell?.AddCreatePostFlyout();
-            shell?.AddMemberPages();
-        }
-
         if (SessionManager.IsAdmin)
-            shell?.AddAdminPages();
+            shell?.AddAdminTab();
+        else
+            shell?.RemoveAdminTab();
 
-        await _nav.GoToAsync("//FeedPage");
+        await _nav.GoToAsync("//MainTabs");
     }
 }

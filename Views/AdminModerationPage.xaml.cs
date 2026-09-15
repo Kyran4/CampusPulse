@@ -21,7 +21,7 @@ public partial class AdminModerationPage : ContentPage
 
         _pollTimer = Application.Current.Dispatcher.CreateTimer();
         _pollTimer.Interval = TimeSpan.FromSeconds(7);
-        _pollTimer.Tick += (s, e) => (BindingContext as AdminModerationViewModel)?.RefreshCommand.Execute(null);
+        _pollTimer.Tick += (s, e) => _ = (BindingContext as AdminModerationViewModel)?.PollAsync();
         _pollTimer.Start();
     }
 

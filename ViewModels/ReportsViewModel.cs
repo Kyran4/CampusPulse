@@ -37,7 +37,7 @@ public class ReportsViewModel : BaseViewModel
     public ICommand MarkReviewedCommand { get; }
     public ICommand UndoReviewCommand { get; }
 
-    private async Task LoadReportsAsync()
+    private async Task LoadReportsAsync(bool showErrorAlert = true)
     {
         IsBusy = true;
 
@@ -49,13 +49,15 @@ public class ReportsViewModel : BaseViewModel
             foreach (var r in list)
                 Reports.Add(r);
         }
-        else
+        else if (showErrorAlert)
         {
             await _dialog.ShowAlert("Error", "Couldn't load reports." + (string.IsNullOrWhiteSpace(_reports.LastError) ? "" : $"\n\n({_reports.LastError})"));
         }
 
         IsBusy = false;
     }
+
+    public async Task PollAsync() => await LoadReportsAsync(showErrorAlert: false);
 
     public async Task OpenPostAsync(int? postId)
     {

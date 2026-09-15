@@ -21,7 +21,7 @@ public partial class EventsPage : ContentPage
 
         _pollTimer = Application.Current.Dispatcher.CreateTimer();
         _pollTimer.Interval = TimeSpan.FromSeconds(7);
-        _pollTimer.Tick += (s, e) => (BindingContext as EventsViewModel)?.RefreshCommand.Execute(null);
+        _pollTimer.Tick += (s, e) => _ = (BindingContext as EventsViewModel)?.PollAsync();
         _pollTimer.Start();
     }
 

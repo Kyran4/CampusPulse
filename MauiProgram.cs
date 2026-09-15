@@ -115,6 +115,11 @@ public static class MauiProgram
         builder.Services.AddTransient<AdminUsersViewModel>();
         builder.Services.AddTransient<AdminUsersPage>();
 
+        // Admin Hub (consolidates Dashboard/Moderation/Reports/Users behind
+        // a single bottom-tab entry)
+        builder.Services.AddTransient<AdminHubViewModel>();
+        builder.Services.AddTransient<AdminHubPage>();
+
         // Interests (follow/unfollow categories)
         builder.Services.AddTransient<InterestsViewModel>();
         builder.Services.AddTransient<InterestsPage>();

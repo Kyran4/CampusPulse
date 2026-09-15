@@ -53,11 +53,16 @@ public class EventDetailsViewModel : BaseViewModel
     public ICommand JoinCommand { get; }
     public ICommand LeaveCommand { get; }
 
-    public async Task RefreshAsync()
+    public async Task RefreshAsync(bool showErrorAlert = true)
     {
         IsBusy = true;
 
         Event = await _events.GetEventAsync(EventId);
+
+        if (Event == null && showErrorAlert)
+        {
+            await _dialog.ShowAlert("Error", "Couldn't load this event." + (string.IsNullOrWhiteSpace(_events.LastError) ? "" : $"\n\n({_events.LastError})"));
+        }
 
         var attendees = await _events.GetAttendeesAsync(EventId);
         Attendees.Clear();

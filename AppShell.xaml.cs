@@ -11,38 +11,36 @@ public partial class AppShell : Shell
     // protected by the Navigating guard below - an allow-list rather than a
     // growing block-list, so any new page added later is protected by
     // default instead of accidentally left open.
-    private static readonly string[] PublicRoutes =
-    {
-        "LoginPage", "LoginPageFlyout", "RegisterPage", "RegisterPageFlyout"
-    };
+    private static readonly string[] PublicRoutes = { "LoginPage", "RegisterPage" };
 
     public AppShell()
     {
         InitializeComponent();
 
-        // Existing route registrations
-        Routing.RegisterRoute("CreatePostPage", typeof(CreatePostPage));
+        // Routes for pages that aren't tabs - reached only via GoToAsync,
+        // never shown as a persistent nav destination. Tabs themselves
+        // (Feed/Events/Create/My Posts/Profile) don't need this - they're
+        // already wired up directly in AppShell.xaml.
         Routing.RegisterRoute("EventDetailsPage", typeof(EventDetailsPage));
         Routing.RegisterRoute("PostDetailsPage", typeof(PostDetailsPage));
-        Routing.RegisterRoute("RegisterPage", typeof(RegisterPage));
-        Routing.RegisterRoute("LoginPage", typeof(LoginPage));
         Routing.RegisterRoute("CreateEventPage", typeof(CreateEventPage));
+        Routing.RegisterRoute("InterestsPage", typeof(InterestsPage));
+        Routing.RegisterRoute("AdminHubPage", typeof(AdminHubPage));
+        Routing.RegisterRoute("AdminDashboardPage", typeof(AdminDashboardPage));
+        Routing.RegisterRoute("AdminModerationPage", typeof(AdminModerationPage));
+        Routing.RegisterRoute("ReportsPage", typeof(ReportsPage));
+        Routing.RegisterRoute("AdminUsersPage", typeof(AdminUsersPage));
 
-        // Global auth guard - runs before every navigation, flyout tap
-        // included. Without this, a signed-out user could still reach
-        // Feed/Events/Profile/etc directly (e.g. by tapping a flyout item
-        // that's technically still registered) even though the menu tries
-        // to hide them.
+        // Global auth guard - runs before every navigation. Without this, a
+        // signed-out user could still reach a protected route directly
+        // (e.g. a stale deep link) even with no tab bar pointing at it.
         Navigating += OnShellNavigating;
 
         // Check auth on startup - deliberately on Loaded, not fired
-        // directly here. The constructor runs before the native flyout
-        // control has actually finished initializing, so adding flyout
-        // items (AddAdminPages/AddMemberPages/etc) this early sometimes
-        // doesn't get picked up by the rendered flyout until something
-        // else forces a refresh - which is exactly why logging out and
-        // back in "fixed" it: that's a full Shell navigation reset, not a
-        // real fix. Loaded fires once the control is actually ready.
+        // directly here. The constructor runs before the native Shell UI
+        // has actually finished initializing, so touching tab visibility
+        // this early sometimes doesn't get picked up by the rendered UI
+        // until something else forces a refresh.
         Loaded += OnShellLoaded;
     }
 
@@ -73,276 +71,64 @@ public partial class AppShell : Shell
 
         if (string.IsNullOrWhiteSpace(token))
         {
-            // Remove admin/member-only pages if any were added
-            RemoveAdminPages();
-            RemoveCreatePostFlyout();
-            RemoveMemberPages();
+            RemoveAdminTab();
             SessionManager.Logout();
-            AddAuthFlyout();
-
-            // Redirect to login
             await Shell.Current.GoToAsync("//LoginPage");
             return;
         }
 
         // We have a token from a previous session - restore who's logged in
-        // and re-show the Admin flyout items if they're an Admin. Without
-        // this, an Admin who restarted the app would keep a valid token but
-        // lose their Admin menu until they logged out and back in.
+        // and re-show the Admin tab if they're an Admin. Without this, an
+        // Admin who restarted the app would keep a valid token but lose
+        // their Admin tab until they logged out and back in.
         var user = db.LoadUser<User>();
         SessionManager.CurrentUser = user;
 
-        RemoveAuthFlyout();
-        AddCreatePostFlyout();
-        AddMemberPages();
-
         if (SessionManager.IsAdmin)
-            AddAdminPages();
+            AddAdminTab();
         else
-            RemoveAdminPages();
+            RemoveAdminTab();
 
-        // Explicit navigation rather than relying on whatever Shell's
-        // default initial route happened to be: that default navigation
-        // can fire before this async method finishes, when
-        // SessionManager.IsLoggedIn is still false - the Navigating guard
-        // would correctly-but-wrongly bounce it to Login. This makes the
-        // authenticated case deterministic regardless of that race.
-        await Shell.Current.GoToAsync("//FeedPage");
+        // Explicit navigation rather than relying on Shell's default
+        // initial route: that default can fire before this async method
+        // finishes, when SessionManager.IsLoggedIn is still false - the
+        // Navigating guard would correctly-but-wrongly bounce it to Login.
+        await Shell.Current.GoToAsync("//MainTabs");
     }
 
     // ---------------------------------------------------------
-    // LOGIN / REGISTER FLYOUT (visible only when logged out)
+    // ADMIN TAB (visible only for Admins) - the one piece of the bottom bar
+    // that still needs to change based on who's signed in. Everything else
+    // (Feed/Events/Create/My Posts/Profile) is a fixed, always-visible tab
+    // once you're authenticated at all.
     // ---------------------------------------------------------
-    // Login/Register are declared in AppShell.xaml with
-    // FlyoutItemIsVisible="False" so they're never implicitly shown - the
-    // actual visible menu entries are these dynamically added ones,
-    // following the same pattern as AddCreatePostFlyout/AddAdminPages.
-    public void AddAuthFlyout()
+    public void AddAdminTab()
     {
-        if (Items.Any(i => i.Route == "LoginPageFlyout" || i.Route == "RegisterPageFlyout"))
+        if (MainTabBar.Items.Any(i => i.Route == "AdminHubPage"))
             return;
 
-        var login = new FlyoutItem
+        var adminTab = new Tab
         {
-            Title = "Sign In",
-            Route = "LoginPageFlyout",
-            Items =
-            {
-                new ShellContent
-                {
-                    Route = "LoginPageFlyout",
-                    ContentTemplate = new DataTemplate(typeof(LoginPage))
-                }
-            }
-        };
-
-        var register = new FlyoutItem
-        {
-            Title = "Register",
-            Route = "RegisterPageFlyout",
-            Items =
-            {
-                new ShellContent
-                {
-                    Route = "RegisterPageFlyout",
-                    ContentTemplate = new DataTemplate(typeof(RegisterPage))
-                }
-            }
-        };
-
-        Items.Add(login);
-        Items.Add(register);
-    }
-
-    public void RemoveAuthFlyout()
-    {
-        var authItems = Items
-            .Where(i => i.Route == "LoginPageFlyout" || i.Route == "RegisterPageFlyout")
-            .ToList();
-
-        foreach (var item in authItems)
-            Items.Remove(item);
-    }
-
-    // ---------------------------------------------------------
-    // MEMBER-ONLY PAGES (My Posts / My Interests) - visible only when
-    // signed in, same reasoning as Create Post/Admin pages. The static
-    // versions in AppShell.xaml are FlyoutItemIsVisible="False"; these
-    // dynamic ones (same Route values) are the actual visible entries.
-    // ---------------------------------------------------------
-    public void AddMemberPages()
-    {
-        if (Items.Any(i => i.Route == "MyPostsPage" || i.Route == "InterestsPage"))
-            return;
-
-        var myPosts = new FlyoutItem
-        {
-            Title = "My Posts",
-            Icon = "posts.png",
-            Route = "MyPostsPage",
-            Items =
-            {
-                new ShellContent
-                {
-                    Route = "MyPostsPage",
-                    ContentTemplate = new DataTemplate(typeof(MyPostsPage))
-                }
-            }
-        };
-
-        var interests = new FlyoutItem
-        {
-            Title = "My Interests",
-            Route = "InterestsPage",
-            Items =
-            {
-                new ShellContent
-                {
-                    Route = "InterestsPage",
-                    ContentTemplate = new DataTemplate(typeof(InterestsPage))
-                }
-            }
-        };
-
-        Items.Add(myPosts);
-        Items.Add(interests);
-    }
-
-    public void RemoveMemberPages()
-    {
-        var memberItems = Items
-            .Where(i => i.Route == "MyPostsPage" || i.Route == "InterestsPage")
-            .ToList();
-
-        foreach (var item in memberItems)
-            Items.Remove(item);
-    }
-
-    // ---------------------------------------------------------
-    // ADD ADMIN PAGES
-    // ---------------------------------------------------------
-    public void AddAdminPages()
-    {
-        // Prevent duplicates
-        if (Items.Any(i =>
-            i.Route == "AdminDashboardPage" ||
-            i.Route == "AdminModerationPage" ||
-            i.Route == "ReportsPage" ||
-            i.Route == "AdminUsersPage"))
-        {
-            return;
-        }
-
-        var adminDashboard = new FlyoutItem
-        {
-            Title = "Admin Dashboard",
+            Title = "Admin",
             Icon = "admin.png",
-            Route = "AdminDashboardPage",
+            Route = "AdminHubPage",
             Items =
             {
                 new ShellContent
                 {
-                    Route = "AdminDashboardPage",
-                    ContentTemplate = new DataTemplate(typeof(AdminDashboardPage))
+                    Route = "AdminHubPage",
+                    ContentTemplate = new DataTemplate(typeof(AdminHubPage))
                 }
             }
         };
 
-        var moderation = new FlyoutItem
-        {
-            Title = "Moderation",
-            Icon = "moderation.png",
-            Route = "AdminModerationPage",
-            Items =
-            {
-                new ShellContent
-                {
-                    Route = "AdminModerationPage",
-                    ContentTemplate = new DataTemplate(typeof(AdminModerationPage))
-                }
-            }
-        };
-
-        var reports = new FlyoutItem
-        {
-            Title = "Reports",
-            Icon = "reports.png",
-            Route = "ReportsPage",
-            Items =
-            {
-                new ShellContent
-                {
-                    Route = "ReportsPage",
-                    ContentTemplate = new DataTemplate(typeof(ReportsPage))
-                }
-            }
-        };
-
-        var users = new FlyoutItem
-        {
-            Title = "Manage Users",
-            Icon = "users.png",
-            Route = "AdminUsersPage",
-            Items =
-            {
-                new ShellContent
-                {
-                    Route = "AdminUsersPage",
-                    ContentTemplate = new DataTemplate(typeof(AdminUsersPage))
-                }
-            }
-        };
-
-        Items.Add(adminDashboard);
-        Items.Add(moderation);
-        Items.Add(reports);
-        Items.Add(users);
+        MainTabBar.Items.Add(adminTab);
     }
 
-    // ---------------------------------------------------------
-    // REMOVE ADMIN PAGES (automatic on logout or non-admin login)
-    // ---------------------------------------------------------
-    public void RemoveAdminPages()
+    public void RemoveAdminTab()
     {
-        var adminItems = Items
-            .Where(i =>
-                i.Route == "AdminDashboardPage" ||
-                i.Route == "AdminModerationPage" ||
-                i.Route == "ReportsPage" ||
-                i.Route == "AdminUsersPage")
-            .ToList();
-
-        foreach (var item in adminItems)
-            Items.Remove(item);
-    }
-
-    public void AddCreatePostFlyout()
-    {
-        if (Items.Any(i => i.Route == "CreatePostPage"))
-            return;
-
-        var createPost = new FlyoutItem
-        {
-            Title = "Create Post",
-            Icon = "posts.png",
-            Route = "CreatePostPage",
-            Items =
-        {
-            new ShellContent
-            {
-                Route = "CreatePostPage",
-                ContentTemplate = new DataTemplate(typeof(CreatePostPage))
-            }
-        }
-        };
-
-        Items.Add(createPost);
-    }
-
-    public void RemoveCreatePostFlyout()
-    {
-        var item = Items.FirstOrDefault(i => i.Route == "CreatePostPage");
-        if (item != null)
-            Items.Remove(item);
+        var adminTab = MainTabBar.Items.FirstOrDefault(i => i.Route == "AdminHubPage");
+        if (adminTab != null)
+            MainTabBar.Items.Remove(adminTab);
     }
 }

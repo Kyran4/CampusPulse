@@ -22,7 +22,7 @@ public partial class AdminUsersPage : ContentPage
         // Other users registering/being deactivated by another Admin.
         _pollTimer = Application.Current.Dispatcher.CreateTimer();
         _pollTimer.Interval = TimeSpan.FromSeconds(7);
-        _pollTimer.Tick += (s, e) => (BindingContext as AdminUsersViewModel)?.RefreshCommand.Execute(null);
+        _pollTimer.Tick += (s, e) => _ = (BindingContext as AdminUsersViewModel)?.PollAsync();
         _pollTimer.Start();
     }
 
