@@ -1,4 +1,4 @@
-﻿using System.Net.Http;
+using System.Net.Http;
 using System.Net.Http.Json;
 
 namespace CampusPulse.Services;
@@ -20,7 +20,7 @@ public class ApiClient
     // All devices (the API host and every phone/tablet/laptop testing
     // against it) need to be on the same WiFi network, and Windows
     // Firewall needs to allow inbound connections on port 5162.
-    private const string ServerIp = "192.168.68.57"; // e.g. "192.168.1.23"
+    private const string ServerIp = ""; // e.g. "192.168.1.23"
 
     private readonly HttpClient _http;
 
